@@ -1,0 +1,7 @@
+node_modules
+database.db
+.DS_Store
+dumb.rdb
+src/generated/prisma
+.env
+dist/

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+</head>
+<body>
+    <form id="login-form">
+        <div>
+            <label for="username">아이디</label>
+            <input id="username" type="text" name="username" required>
+        </div>
+
+        <div>
+            <label for="password">비밀번호</label>
+            <input id="password" type="password" name="password" required>
+        </div>
+
+        <button type="submit">로그인</button>
+    </form>
+
+    <script>
+        const loginForm = document.getElementById("login-form");
+
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(loginForm);
+
+            const username = formData.get("username")?.toString().trim();
+            const password = formData.get("password")?.toString().trim();
+
+            try {
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username,
+                        password
+                    })
+                });
+
+                if (!res.ok) {
+                    const data = await res.json();
+                    alert(data.message);
+                    return;
+                }
+
+                location.href = "/";
+            } catch (e) {
+                if (e instanceof SyntaxError) {
+                    alert("서버 응답 형식이 올바르지 않습니다.");
+                } else {
+                    alert("서버에 연결할 수 없습니다.");
+                }
+            }
+        });
+    </script>
+</body>
+</html>

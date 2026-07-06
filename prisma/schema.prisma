@@ -38,3 +38,20 @@ model User {
   updatedAt        DateTime  @updatedAt
   deletedAt        DateTime?
 }
+
+model Board {
+  id          Int      @id              @default(autoincrement())
+
+  url         String   @unique
+  name        String
+  description String?
+
+  createdBy   String
+  canRead     Boolean  @default(true)
+  canWrite    Boolean  @default(true)
+  isPrivate   Boolean  @default(false)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+}

@@ -18,7 +18,7 @@ enum Role {
 }
 
 model User {
-  id               String    @id               @default(uuid())
+  id               String    @id @default(uuid())
   username         String    @unique
   password         String
   email            String    @unique
@@ -37,21 +37,88 @@ model User {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   deletedAt        DateTime?
+
+  posts Post[]
+
+  postReactions PostReaction[]
+
+  attachments Attachment[]
 }
 
 model Board {
-  id          Int      @id              @default(autoincrement())
+  id          Int       @id @default(autoincrement())
 
-  url         String   @unique
+  url         String    @unique
   name        String
   description String?
 
   createdBy   String
-  canRead     Boolean  @default(true)
-  canWrite    Boolean  @default(true)
-  isPrivate   Boolean  @default(false)
+  canRead     Boolean   @default(true)
+  canWrite    Boolean   @default(true)
+  isPrivate   Boolean   @default(false)
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
+
+  posts Post[]
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+
+  title String
+  content String
+  isAnonymous Boolean
+
+  authorId String
+  author User @relation(fields: [authorId], references: [id])
+  boardId Int
+  board Board @relation(fields: [boardId], references: [id])
+
+  attachments Attachment[]
+  
+  reactions PostReaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+}
+
+model Attachment {
+  id        String    @id @default(cuid())
+
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id])
+
+  postId    Int?
+  post      Post?     @relation(fields: [postId], references: [id])
+  
+  isImage   Boolean   @default(false)
+  fileName  String
+  fileUrl   String    @unique
+  fileType  String
+  size      Int
+
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+}
+
+model PostReaction {
+  id        String   @id @default(cuid())
+
+  userId    String
+  postId    Int
+
+  type      Int // 1이면 좋아요 0이면 싫어요
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, postId])
+  @@index([postId])
+  @@index([userId])
 }

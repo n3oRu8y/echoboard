@@ -1,7 +1,7 @@
 node_modules
-database.db
+dev.db
 .DS_Store
-dumb.rdb
+dump.rdb
 src/generated/prisma
 .env
 dist/

@@ -1,0 +1,51 @@
+<form id="register-form">
+    <div>
+        <label for="email">이메일</label>
+        <input type="email" name="email">
+    </div>
+
+    <div>
+        <label for="username">아이디</label>
+        <input type="text" name="username">
+    </div>
+
+    <div>
+        <label for="password">비밀번호</label>
+        <input type="password" name="password">
+    </div>
+
+    <button type="submit">회원가입</button>
+</form>
+<script>
+    const registerForm = document.getElementById("register-form");
+    registerForm.addEventListener("submit", async e => {
+        e.preventDefault();
+        const formData = new FormData(registerForm);
+
+        try {
+            const res = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: formData.get("email")?.toString().trim(),
+                    username: formData.get("username")?.toString().trim(),
+                    password: formData.get("password")?.toString().trim()
+                })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                return alert(data.message);
+            }
+
+            return location.href = "/";
+        } catch (e) {
+            if (e instanceof SyntaxError) {
+                return alert("서버 응답 오류");
+            }
+            alert(e);
+        }
+    });
+</script>

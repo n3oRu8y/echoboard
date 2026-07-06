@@ -8,4 +8,12 @@ export default class AuthPageController {
 
         return res.render("auth/login.ejs");
     }
+
+    static async Register(req: Request, res: Response) {
+        if (req.session?.userId) {
+            return res.redirect("/");
+        }
+
+        return res.render("auth/register.ejs");
+    }
 }

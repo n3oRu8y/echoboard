@@ -42,7 +42,8 @@ export default class BoardRepo {
                     deletedAt: board.deletedAt
                 },
                 where: {
-                    id: boardId
+                    id: boardId,
+                    deletedAt: null
                 }
             });
         } catch (e) {
@@ -55,7 +56,11 @@ export default class BoardRepo {
     }
 
     public async FetchAll() {
-        const rows = await prisma.board.findMany({});
+        const rows = await prisma.board.findMany({
+            where: {
+                deletedAt: null
+            }
+        });
         const result = [];
         for (const row of rows) {
             result.push(Board.FromRow(row));
@@ -66,7 +71,8 @@ export default class BoardRepo {
     public async FindById(boardId: number) {
         const row = await prisma.board.findUnique({
             where: {
-                id: boardId
+                id: boardId,
+                deletedAt: null
             }
         });
         return row ? Board.FromRow(row) : null;
@@ -75,7 +81,8 @@ export default class BoardRepo {
     public async FindByUrl(url: string): Promise<Board | null> {
         const row = await prisma.board.findUnique({
             where: {
-                url: url
+                url: url,
+                deletedAt: null
             }
         });
         return row ? Board.FromRow(row) : null;

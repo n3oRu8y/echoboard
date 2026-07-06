@@ -79,4 +79,14 @@ export default class BoardService {
         board.description = description;
         await this.repo.Update(boardId, board);
     }
+
+    public async Delete(boardId: number) {
+        const board = await this.repo.FindById(boardId);
+        if (!board) {
+            throw new BoardNotFound(`Could not find a board with the id ${boardId}.`);
+        }
+        const now = new Date();
+        board.deletedAt = now;
+        await this.repo.Update(boardId, board);
+    }
 }

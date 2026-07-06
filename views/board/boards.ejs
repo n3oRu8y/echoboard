@@ -7,6 +7,7 @@
             <th>이름</th>
             <th>설명</th>
             <th>생성자</th>
+            <th>삭제</th>
         </tr>
     </thead>
 
@@ -18,6 +19,7 @@
             <td><%= board.name %></td>
             <td><%= board.description %></td>
             <td><%= board.createdBy %></td>
+            <td><button class="board-delete-button" data-target="<%= board.id %>">삭제</button></td>
         </tr>
         <% }); %>
     </tbody>
@@ -126,5 +128,18 @@
         } catch (e) {
             alert("요청 오류");
         }
-    })
+    });
+
+    document.querySelectorAll(".board-delete-button").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const target = btn.dataset.target;
+            const res = await fetch(`/api/boards/${target}`, { method: "DELETE" });
+
+            if (!res.ok) {
+                const data = await res.json();
+                return alert(data.message);
+            }
+            location.reload();
+        });
+    });
 </script>

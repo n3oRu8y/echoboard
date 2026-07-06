@@ -96,4 +96,34 @@ export default class BoardController {
 
         return res.status(201).json({ status: "ok" });
     }
+
+    public static async DeleteBoard(req: Request, res: Response) {
+        if (!req.session?.userId) {
+            return res.status(401).json({ status: "error", message: "로그인해주세요." });
+        }
+
+        const userService = new UserService(new UserRepo());
+        const user = await userService.GetUserWithUserId(req.session.userId);
+
+        if (user.role != "ADMIN") {
+            return res.status(403).json({ status: "error", message: "관리자만 게시판 삭제가 가능합니다." });
+        }
+
+        const boardId = Number(req.params.boardId);
+        if (!Number.isInteger(boardId) || boardId <= 0) {
+            return res.status(404).json({ status: "error", message: "게시판을 찾을 수 없습니다." });
+        }
+
+        try {
+            const boardService = new BoardService(new BoardRepo());
+            await boardService.Delete(boardId);
+        } catch (e) {
+            if (e instanceof BoardNotFound) {
+                return res.status(404).json({ status: "error", message: "게시판을 찾을 수 없습니다." });
+            }
+            throw e;
+        }
+
+        return res.status(201).json({ status: "error" });
+    }
 }

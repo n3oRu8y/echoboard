@@ -1,0 +1,130 @@
+<h1>게시판 목록</h1>
+<table>
+    <thead>
+        <tr>
+            <th>아이디</th>
+            <th>링크</th>
+            <th>이름</th>
+            <th>설명</th>
+            <th>생성자</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% boards.forEach(board => { %>
+        <tr>
+            <td><%= board.id %></td>
+            <td><%= board.url %></td>
+            <td><%= board.name %></td>
+            <td><%= board.description %></td>
+            <td><%= board.createdBy %></td>
+        </tr>
+        <% }); %>
+    </tbody>
+</table>
+
+<form id="create-board-form">
+    <h2>게시판 생성하기</h2>
+    <div>
+        <label for="url">링크</label>
+        <input type="text" name="url">
+    </div>
+
+    <div>
+        <label for="name">이름</label>
+        <input type="text" name="name">
+    </div>
+
+    <div>
+        <label for="description">설명</label>
+        <input type="text" name="description">
+    </div>
+
+    <button type="submit">생성</button>
+</form>
+
+<form id="edit-board-form">
+    <h2>게시판 수정하기</h2>
+
+    <div>
+        <label for="id">대상 게시판</label>
+        <input type="text" name="id">
+    </div>
+
+    <div>
+        <label for="url">링크</label>
+        <input type="text" name="url">
+    </div>
+
+    <div>
+        <label for="name">이름</label>
+        <input type="text" name="name">
+    </div>
+
+    <div>
+        <label for="description">설명</label>
+        <input type="text" name="description">
+    </div>
+
+    <button type="submit">생성</button>
+</form>
+<script>
+    const createBoardFrom = document.getElementById("create-board-form");
+    const editBoardForm = document.getElementById("edit-board-form");
+
+    createBoardFrom.addEventListener("submit", async e => {
+        e.preventDefault();
+        const formData = new FormData(createBoardFrom);
+
+        try {
+            const res = await fetch("/api/boards", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    url: formData.get("url")?.toString().trim(),
+                    name: formData.get("name")?.toString().trim(),
+                    description: formData.get("description")?.toString().trim()
+                })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                return alert(data.message);
+            }
+
+            location.reload();
+        } catch (e) {
+            alert("요청오류");
+        }
+    });
+
+    editBoardForm.addEventListener("submit", async e => {
+        e.preventDefault();
+        const formData = new FormData(editBoardForm);
+
+        try {
+            const res = await fetch(`/api/boards/${formData.get("id")?.toString().trim()}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    url: formData.get("url")?.toString().trim(),
+                    name: formData.get("name")?.toString().trim(),
+                    description: formData.get("description").toString().trim()
+                })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                return alert(data.message);
+            }
+
+            location.reload();
+        } catch (e) {
+            alert("요청 오류");
+        }
+    })
+</script>

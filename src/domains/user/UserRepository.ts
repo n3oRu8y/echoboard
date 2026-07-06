@@ -2,7 +2,7 @@ import prisma from "../../db/prisma.js";
 import User, { Role as DomainRole } from "./UserDomain.js";
 import { Role } from "../../generated/prisma/enums.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
-import DuplicateUserData from "./exceptions/DuplicateUserData.js";
+import { ConflictError } from "../../common/exceptions/ConflictError.js";
 
 export default class UserRepo {
     private ToPrismaRole(role: DomainRole) {
@@ -28,7 +28,7 @@ export default class UserRepo {
             if (e instanceof PrismaClientKnownRequestError) {
                 if (e.code == "P2002") {
                     const target = e.meta?.target as Array<string>[0];
-                    throw new DuplicateUserData(target);
+                    throw new ConflictError(target);
                 }
             }
             throw e;
@@ -58,7 +58,7 @@ export default class UserRepo {
             if (e instanceof PrismaClientKnownRequestError) {
                 if (e.code == "P2002") {
                     const target = e.meta?.target as Array<string>[0];
-                    throw new DuplicateUserData(target);
+                    throw new ConflictError(target);
                 }
                 throw e;
             }

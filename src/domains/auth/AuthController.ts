@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import UserService from "../user/UserService.js";
 import UserRepo from "../user/UserRepository.js";
-import DuplicateUserData from "../user/exceptions/DuplicateUserData.js";
+import { ConflictError } from "../../common/exceptions/ConflictError.js";
 
 export default class AuthController {
     static async Login(req: Request, res: Response) {
@@ -40,7 +40,7 @@ export default class AuthController {
             const userService = await new UserService(new UserRepo());
             await userService.Register(username, password, email);
         } catch (e) {
-            if (e instanceof DuplicateUserData) {
+            if (e instanceof ConflictError) {
                 return res.status(409).json({ status: "error", message: "이메일 또는 아이디가 중복됩니다. "});
             }
 

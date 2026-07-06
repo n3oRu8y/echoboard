@@ -56,7 +56,7 @@ export default class UserRepo {
             });
         } catch (e) {
             if (e instanceof PrismaClientKnownRequestError) {
-                if (e.code == "P1002") {
+                if (e.code == "P2002") {
                     const target = e.meta?.target as Array<string>[0];
                     throw new DuplicateUserData(target);
                 }

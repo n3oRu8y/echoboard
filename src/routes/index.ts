@@ -5,7 +5,7 @@ import ApiRoutes from "./ApiRoutes.js";
 
 const routes = express.Router();
 
-routes.use("/", PageRoutes);
 routes.use("/api", ApiRoutes);
+routes.use("/", PageRoutes);
 
 export default routes;

@@ -1,8 +1,8 @@
 import argon2 from "argon2";
 import type UserRepo from "./UserRepository.js";
-import User, { Role } from "./UserDomain.js";
 import UserNotFound from "./exceptions/UserNotFound.js";
 import CredentialFailed from "../../common/exceptions/CredentialFailed.js";
+import User from "./UserDomain.js";
 
 export default class UserService {
     constructor(private readonly repo: UserRepo) {}
@@ -41,7 +41,16 @@ export default class UserService {
             throw new UserNotFound(`Could not find a user with the username ${username}.`);
         }
 
-        return user.username;
+        return user.id;
+    }
+
+    public async GetUserWithUserId(userId: string) {
+        const user = await this.repo.FindByUserId(userId);
+        if (!user) {
+            throw new UserNotFound(`Could not find a user with the id ${userId}.`);
+        }
+
+        return user;
     }
 
     public async Withraw(userId: string, password: string) {

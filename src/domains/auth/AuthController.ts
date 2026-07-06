@@ -21,7 +21,7 @@ export default class AuthController {
         }
 
         const userId = await userService.GetUserIdWithUsername(username);
-        req.session.userId = userId;
+        req.session.userId = userId!;
 
         return res.status(201).json({ status: "ok" });
     }

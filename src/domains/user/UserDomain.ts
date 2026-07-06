@@ -1,8 +1,3 @@
-export enum Role {
-    USER,
-    ADMIN
-}
-
 export default class User {
     constructor(
         public id: string | null,
@@ -12,7 +7,7 @@ export default class User {
         
         public nickname: string | null,
 
-        public role: Role,
+        public role: string,
 
         private _bannedUntil: Date | null,
         private _banReason: string | null,
@@ -33,7 +28,7 @@ export default class User {
             password,
             email,
             null,
-            Role.USER,
+            "USER",
             null,
             null,
             false,

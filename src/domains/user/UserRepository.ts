@@ -1,14 +1,15 @@
 import prisma from "../../db/prisma.js";
-import User, { Role as DomainRole } from "./UserDomain.js";
+import User from "./UserDomain.js";
 import { Role } from "../../generated/prisma/enums.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { ConflictError } from "../../common/exceptions/ConflictError.js";
 
 export default class UserRepo {
-    private ToPrismaRole(role: DomainRole) {
+    private ToPrismaRole(role: string) {
         switch (role) {
-            case (DomainRole.USER): return Role.USER;
-            case (DomainRole.ADMIN): return Role.ADMIN;
+            case ("USER"): return Role.USER;
+            case ("ADMIN"): return Role.ADMIN;
+            default: return Role.USER;
         }
     }
 

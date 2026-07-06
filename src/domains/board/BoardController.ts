@@ -9,7 +9,7 @@ import BoardNotFound from "./exceptions/BoardNotFound.js";
 export default class BoardController {
     public static async CreateBoard(req: Request, res: Response) {
         if (!req.session?.userId) {
-            res.status(401).json({ status: "error", message: "로그인해주세요." });
+            return res.status(401).json({ status: "error", message: "로그인해주세요." });
         }
 
         const userService = new UserService(new UserRepo());

@@ -16,12 +16,22 @@ export default class BoardService {
         return await this.repo.FetchAll();
     }
 
-    public async GetById(id: number) {
+    public async GetById(id: number): Promise<Board>;
+    public async GetById(id: number, silent: false): Promise<Board>;
+    public async GetById(id: number, silent: true): Promise<Board | null>;
+
+    public async GetById(id: number, silent = false): Promise<Board | null> {
         const board = await this.repo.FindById(id);
+
         if (!board) {
-            throw new BoardNotFound(`Could not find a board with the url ${id}.`);
+            if (silent) {
+                return null;
+            }
+
+            throw new BoardNotFound(`Could not find a board with the id ${id}.`);
         }
-        return board
+
+        return board;
     }
 
     public async GetByUrl(url: string) {

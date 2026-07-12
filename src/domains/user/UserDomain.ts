@@ -46,7 +46,7 @@ export default class User {
             row.username,
             row.password,
             row.email,
-            row.nickname,
+            row.nickname ? row.nickname : row.username,
             row.role,
             row.bannedUntil,
             row.banReason,

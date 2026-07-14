@@ -35,7 +35,7 @@ app.set("views", path.join(process.cwd(), "views"));
 app.use(expressLayouts);
 app.set("layout", "layout");
 
-app.use(express.static(path.join(process.cwd(), "public")));
+app.use("/public", express.static(path.join(process.cwd(), "public")));
 
 app.use(express.json({
     limit: "50mb"

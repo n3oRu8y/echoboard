@@ -1,0 +1,51 @@
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+<h1><%= post.title %></h1>
+
+<p>작성자: <%= post.isAnonymous ? "익명" : post.author.nickname %></p>
+
+<div class="post-content">
+    <%- post.content %>
+</div>
+
+<div>
+    <% if (post.author.id == user?.id) { %>
+        <a href="/boards/<%= post.board.url %>/<%= post.id %>/edit">수정</a>
+    <% } if (post.author.id == user?.id || user?.role == "ADMIN") { %>
+        <btn id="deleteBtn">삭제</btn>
+    <% } %>
+</div>
+
+<% if (post.attachments.length > 0) { %>
+    <div>
+        <ul>
+            <% post.attachments.forEach(attachment => { %>
+                <li>
+                    <p><%= attachment.fileName %></p>
+                    <a href="/api/attachments/<%= attachment.id %>">다운로드</a>
+                </li>
+            <% }); %> 
+        </ul>
+    </div>
+<% } %>
+    
+</div>
+<script>
+    const deleteBtn = document.getElementById("deleteBtn");
+    deleteBtn.addEventListener("click", async e => {
+        if (!confirm("게시글을 삭제하겠습니까?")) return;
+        try {
+            const res = await fetch("/api/boards/<%= post.board.url %>/posts/<%= post.id %>", { method: "DELETE" });
+            if (!res.ok) {
+                const data = await res.json();
+                return alert(data.message);
+            }
+
+            alert("게시글이 삭제되었습니다.");
+            location.href = "/boards/<%= post.board.url %>"
+        } catch {
+            console.log("인터넷 연결 오류");
+        }
+    });
+</script>

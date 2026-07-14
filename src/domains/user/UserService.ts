@@ -44,7 +44,11 @@ export default class UserService {
         return user.id;
     }
 
-    public async GetUserWithUserId(userId: string) {
+    public async GetUserWithUserId(userId: string): Promise<User>
+    public async GetUserWithUserId(userId: string, silent: false): Promise<User>
+    public async GetUserWithUserId(userId: string, silent: true): Promise<User | null>
+
+    public async GetUserWithUserId(userId: string, silent: boolean = false) {
         const user = await this.repo.FindByUserId(userId);
         if (!user) {
             throw new UserNotFound(`Could not find a user with the id ${userId}.`);

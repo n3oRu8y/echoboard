@@ -1,0 +1,24 @@
+<h1><%= board.name %></h1>
+<p><%= board.description %></p>
+
+<table>
+    <thead>
+        <tr>
+            <th>번호</th>
+            <th>작성자</th>
+            <th>제목</th>
+            <th>작성시간</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% posts.forEach(post => { %>
+        <tr>
+            <td><%= post.id %></td>
+            <td><%= post.isAnonymous ? "익명" : post.author.nickname %></td>
+            <td><a href="/boards/<%= board.url %>/<%= post.id %>"><%= post.title %></a></td>
+            <td><%= post.createdAt %></td>
+        </tr>
+        <% }); %>
+    </tbody>
+</table>

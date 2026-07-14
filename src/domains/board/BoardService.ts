@@ -34,9 +34,13 @@ export default class BoardService {
         return board;
     }
 
-    public async GetByUrl(url: string) {
+    public async GetByUrl(url: string): Promise<Board>;
+    public async GetByUrl(url: string, silent: false): Promise<Board>
+    public async GetByUrl(url: string, silent: true): Promise<Board | null>
+
+    public async GetByUrl(url: string, silent: boolean = false): Promise<Board | null> {
         const board = await this.repo.FindByUrl(url);
-        if (!board) {
+        if (!board && !silent) {
             throw new BoardNotFound(`Could not find a board with the url ${url}.`);
         }
         return board;

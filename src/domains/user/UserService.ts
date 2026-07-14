@@ -50,7 +50,7 @@ export default class UserService {
 
     public async GetUserWithUserId(userId: string, silent: boolean = false) {
         const user = await this.repo.FindByUserId(userId);
-        if (!user) {
+        if (!user && !silent) {
             throw new UserNotFound(`Could not find a user with the id ${userId}.`);
         }
 

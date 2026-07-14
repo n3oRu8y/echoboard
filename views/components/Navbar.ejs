@@ -17,7 +17,7 @@
             <div class="navbar-nav">
                 <% if (user) { %>
                     <a class="nav-link" href="/mypage"><%= user.username %> 님</a>
-                    <button class="nav-link" href="/logout">로그아웃</a>
+                    <button class="nav-link" id="logout-button">로그아웃</a>
                 <% } else { %>
                     <a class="nav-link" href="/login">로그인</a>
                 <% } %>
@@ -25,3 +25,4 @@
         </div>
     </div>
 </nav>
+<script src="/public/js/navbar.js"></script>

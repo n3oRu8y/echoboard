@@ -3,3 +3,11 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
+
+.btn-back {
+    background-color: #808080;
+    border: none;
+    color: #ffffff;
+    padding: 0.5rem;
+    border-radius: 5px;
+}

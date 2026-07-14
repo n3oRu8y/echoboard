@@ -49,4 +49,10 @@ export default class AuthController {
 
         return res.status(201).json({ status: "ok" });
     }
+
+    static async Logout(req: Request, res: Response) {
+        req.session.destroy(() => {
+            return res.status(200).json({ status: "success" });
+        });
+    }
 }

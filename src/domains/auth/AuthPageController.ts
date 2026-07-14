@@ -6,7 +6,9 @@ export default class AuthPageController {
             return res.redirect("/");
         }
 
-        return res.render("auth/login.ejs");
+        return res.render("auth/login.ejs", {
+            title: "로그인"
+        });
     }
 
     static async Register(req: Request, res: Response) {

@@ -7,10 +7,10 @@
     <link href="/public/css/common.css" rel="stylesheet">
     <title><%= title %> - EchoBoard</title>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <%- include("components/navbar.ejs") %>
 
-    <main class="container min-vh-100">
+    <main class="container flex-grow-1 py-4">
         <%- body %>
     </main>
 

@@ -47,6 +47,13 @@ app.use(express.urlencoded({
 }));
 
 app.use(AuthMiddleware);
+
+app.use((req, res, next) => {
+    res.locals.title = "오류";
+    res.locals.user = req.session.user;
+    next();
+});
+
 app.use(routes);
 
 const server = http.createServer(app);

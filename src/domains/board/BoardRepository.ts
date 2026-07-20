@@ -69,6 +69,9 @@ export default class BoardRepo {
                         take: 10,
                         include: {
                             author: true
+                        },
+                        where: {
+                            deletedAt: null
                         }
                     }
                 }

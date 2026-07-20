@@ -14,7 +14,8 @@ export default class BoardPageController {
         const boards = await boardService.GetAll(true);
         return res.render("board/boards.ejs", {
             boards: boards,
-            format: FormatDatetime
+            format: FormatDatetime,
+            title: "게시판 목록"
         });
     }
 

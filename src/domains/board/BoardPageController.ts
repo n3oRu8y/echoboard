@@ -6,13 +6,15 @@ import UserRepo from "../user/UserRepository.js";
 import PostService from "../post/PostService.js";
 import PostRepository from "../post/PostRepositorty.js";
 import AttachmentRepository from "../attachment/AttachmentRepository.js";
+import FormatDatetime from "../../common/utils/FormatDatetime.js";
 
 export default class BoardPageController {
     public static async RenderBoardList(req: Request, res: Response) {
         const boardService = new BoardService(new BoardRepo());
-        const boards = await boardService.GetAll();
+        const boards = await boardService.GetAll(true);
         return res.render("board/boards.ejs", {
-            boards
+            boards: boards,
+            format: FormatDatetime
         });
     }
 

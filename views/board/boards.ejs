@@ -2,7 +2,7 @@
     <% boards.forEach(board => { %>
         <div class="col-12 col-md-6">
             <div class="card h-100" style="min-height:420px;">
-                <div class="card-header fw-bold"><%= board.name %></div>
+                <div class="card-header fw-bold"><a href="/boards/<%= board.url %>" class="list-group-item"><%= board.name %></a></div>
                 <div class="list-group list-group-flush">
                     <% if(board.posts) { %>
                         <% board.posts.forEach(post => { %>

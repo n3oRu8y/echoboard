@@ -55,11 +55,24 @@ export default class BoardRepo {
         }
     }
 
-    public async FetchAll() {
+    public async FetchAll(withPost: boolean = false) {
         const rows = await prisma.board.findMany({
             where: {
                 deletedAt: null
-            }
+            },
+            orderBy: {
+                name: "asc"
+            },
+            ...(withPost && {
+                include: {
+                    posts: {
+                        take: 10,
+                        include: {
+                            author: true
+                        }
+                    }
+                }
+            })
         });
         const result = [];
         for (const row of rows) {

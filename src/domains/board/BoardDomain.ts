@@ -1,3 +1,25 @@
+import User from "../user/UserDomain.js";
+
+class PostSummery {
+    constructor(
+        public id: number,
+        public title: string,
+        public author: User,
+        public isAnonymous: boolean,
+        public createdAt: Date
+    ) {}
+
+    public static FromRow(row: any) {
+        return new PostSummery(
+            row.id,
+            row.title,
+            User.FromRow(row.author),
+            row.isAnonymous,
+            row.createdAt
+        );
+    }
+}
+
 export default class Board {
     constructor(
         public readonly id: number | null,
@@ -8,6 +30,7 @@ export default class Board {
         public canRead: boolean,
         public canWrite: boolean,
         public isPrivate: boolean,
+        public posts: PostSummery | null,
         public createdAt: Date,
         public updatedAt: Date,
         public deletedAt: Date | null
@@ -23,6 +46,7 @@ export default class Board {
             true,
             true,
             false,
+            null,
             createdAt,
             createdAt,
             null
@@ -39,6 +63,7 @@ export default class Board {
             row.canRead,
             row.canWrite,
             row.isPrivate,
+            row.posts ? row.posts.map((post: any) => PostSummery.FromRow(post)) : null,
             row.createdAt,
             row.updatedAt,
             row.deletedAt

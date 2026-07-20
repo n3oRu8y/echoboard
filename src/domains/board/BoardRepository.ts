@@ -55,10 +55,15 @@ export default class BoardRepo {
         }
     }
 
-    public async FetchAll(withPost: boolean = false) {
+    public async FetchAll(withPost: boolean = false, withPrivateBoard: boolean = false) {
         const rows = await prisma.board.findMany({
             where: {
-                deletedAt: null
+                deletedAt: null,
+                ...(!withPrivateBoard && {
+                    canRead: true,
+                    canWrite: true,
+                    isPrivate: false
+                })
             },
             orderBy: {
                 name: "asc"

@@ -1,36 +1,54 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<title>게시글 수정 테스트</title>
-
 <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
-</head>
-<body>
 
-<h2>게시글 작성</h2>
+<div class="container py-5" style="max-width: 900px;">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-4">게시글 수정</h2>
 
-<input type="checkbox" id="is-anonymous" <%= post.isAnonymous ? "checked" : "" %>>
-<input id="title" type="text" placeholder="제목" value="<%= post.title %>">
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="is-anonymous" checked>
+                <label class="form-check-label" for="is-anonymous">
+                    익명으로 작성
+                </label>
+            </div>
 
-<br><br>
+            <div class="mb-4">
+                <input
+                    id="title"
+                    type="text"
+                    class="form-control"
+                    placeholder="제목을 입력하세요"
+                    value="<%= post.title %>"
+                    >
+            </div>
 
-<div id="editor"></div>
+            <div class="mb-4">
+                <div id="editor"></div>
+            </div>
 
-<br>
+            <div class="mb-4">
+                <label for="attachment" class="form-label fw-semibold">
+                    첨부파일
+                </label>
+                <input
+                    type="file"
+                    id="attachment"
+                    class="form-control">
+            </div>
 
-<h3>첨부파일</h3>
+            <ul id="uploaded" class="list-group mb-4"></ul>
 
-<input type="file" id="attachment">
-
-<ul id="uploaded"></ul>
-
-<br>
-
-<button id="submit">게시글 작성</button>
-
+            <div class="d-grid">
+                <button
+                    id="submit"
+                    class="btn btn-primary btn-lg">
+                    게시글 수정
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-
 <script>
 const segments = window.location.pathname
     .split("/")
@@ -54,14 +72,16 @@ const editor = new toastui.Editor({
 
 // 첨부파일 목록 표시
 function addAttachment(attachment) {
-
     const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
 
-    const text = document.createTextNode(attachment.originalName ?? attachment.fileName + " ");
+    const name = document.createElement("span");
+    name.textContent = attachment.originalName ?? attachment.fileName;
 
     const remove = document.createElement("button");
     remove.type = "button";
-    remove.textContent = "삭제";
+    remove.className = "btn btn-sm btn-outline-danger";
+    remove.innerHTML = '삭제';
 
     remove.onclick = () => {
         const index = attachments.findIndex(v => v.id === attachment.id);
@@ -72,7 +92,7 @@ function addAttachment(attachment) {
         li.remove();
     };
 
-    li.appendChild(text);
+    li.appendChild(name);
     li.appendChild(remove);
 
     document.getElementById("uploaded").appendChild(li);

@@ -83,7 +83,8 @@ export default class PostPageController {
         return res.render("post/edit.ejs", {
             post: post,
             attachments: attachments,
-            images: images
+            images: images,
+            title: "게시글 수정"
         });
     }
 

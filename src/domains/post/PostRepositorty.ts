@@ -60,7 +60,7 @@ export default class PostRepository {
                 author: true
             },
             orderBy: {
-                id: "asc",
+                id: "desc",
             }
         });
         
@@ -68,6 +68,17 @@ export default class PostRepository {
         for (const row of rows) {
             result.push(Post.FromRow(row));
         }
+
+        return result;
+    }
+
+    public async FetchPostCount(boardId: number) {
+        const result = await prisma.post.count({
+            where: {
+                deletedAt: null,
+                boardId: boardId
+            }
+        });
 
         return result;
     }

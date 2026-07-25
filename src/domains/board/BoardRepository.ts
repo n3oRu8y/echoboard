@@ -77,6 +77,9 @@ export default class BoardRepo {
                         },
                         where: {
                             deletedAt: null
+                        },
+                        orderBy: {
+                            id: "desc"
                         }
                     }
                 }

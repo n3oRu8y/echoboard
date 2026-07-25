@@ -85,4 +85,8 @@ export default class PostService {
 
         return await this.postRepo.FindByBoardId(boardId, 10, (page - 1) * 10, query);
     }
+
+    public async GetPostCount(boardId: number) {
+        return await this.postRepo.FetchPostCount(boardId);
+    }
 }

@@ -1,168 +1,54 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<title>게시글 작성 테스트</title>
-
 <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
-</head>
-<body>
 
-<h2>게시글 작성</h2>
+<div class="container py-5" style="max-width: 900px;">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-4">게시글 작성</h2>
 
-<input type="checkbox" id="is-anonymous">
-<input id="title" type="text" placeholder="제목">
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="is-anonymous" checked>
+                <label class="form-check-label" for="is-anonymous">
+                    익명으로 작성
+                </label>
+            </div>
 
-<br><br>
+            <div class="mb-4">
+                <input
+                    id="title"
+                    type="text"
+                    class="form-control"
+                    placeholder="제목을 입력하세요">
+            </div>
 
-<div id="editor"></div>
+            <div class="mb-4">
+                <div id="editor"></div>
+            </div>
 
-<br>
+            <div class="mb-4">
+                <label for="attachment" class="form-label fw-semibold">
+                    첨부파일
+                </label>
+                <input
+                    type="file"
+                    id="attachment"
+                    class="form-control">
+            </div>
 
-<h3>첨부파일</h3>
+            <ul id="uploaded" class="list-group mb-4"></ul>
 
-<input type="file" id="attachment">
-
-<ul id="uploaded"></ul>
-
-<br>
-
-<button id="submit">게시글 작성</button>
+            <div class="d-grid">
+                <button
+                    id="submit"
+                    class="btn btn-primary btn-lg">
+                    게시글 작성
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-
-<script>
-const segments = window.location.pathname
-    .split("/")
-    .filter(Boolean);
-
-const boardId = segments[1];
-
-const attachments = [];
-const images = [];
-
-const editor = new toastui.Editor({
-    el: document.querySelector("#editor"),
-    height: "500px",
-    initialEditType: "wysiwyg"
-});
-
-// 첨부파일 목록 표시
-function addAttachment(attachment) {
-
-    const li = document.createElement("li");
-
-    const text = document.createTextNode(attachment.originalName + " ");
-
-    const remove = document.createElement("button");
-    remove.type = "button";
-    remove.textContent = "삭제";
-
-    remove.onclick = () => {
-        const index = attachments.findIndex(v => v.id === attachment.id);
-
-        if (index !== -1)
-            attachments.splice(index, 1);
-
-        li.remove();
-    };
-
-    li.appendChild(text);
-    li.appendChild(remove);
-
-    document.getElementById("uploaded").appendChild(li);
-}
-
-// 에디터 이미지 업로드
-editor.removeHook("addImageBlobHook");
-
-editor.addHook("addImageBlobHook", async (blob, callback) => {
-
-    const formData = new FormData();
-    formData.append("image", blob);
-
-    const res = await fetch("/api/attachments/image", {
-        method: "POST",
-        body: formData
-    });
-
-    if (!res.ok) {
-        alert("이미지 업로드 실패");
-        return;
-    }
-
-    const attachment = await res.json();
-
-    // 본문 이미지도 첨부파일로 관리하려면 유지
-    images.push(attachment.data);
-
-    callback(attachment.data.url, attachment.data.originalName);
-});
-
-// 일반 첨부파일 자동 업로드
-document.getElementById("attachment").addEventListener("change", async (e) => {
-
-    const file = e.target.files[0];
-
-    if (!file)
-        return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch("/api/attachments/file", {
-        method: "POST",
-        body: formData
-    });
-
-    if (!res.ok) {
-        alert("파일 업로드 실패");
-        return;
-    }
-
-    const attachment = await res.json();
-
-    attachments.push(attachment.data);
-
-    addAttachment(attachment.data);
-
-    e.target.value = "";
-});
-
-// 게시글 작성
-document.getElementById("submit").addEventListener("click", async () => {
-    if (attachments.length > 5) return alert("파일 첨부는 5개까지 가능합니다.");
-
-    const body = {
-        title: document.getElementById("title").value,
-        content: editor.getHTML(),
-        attachmentIds: attachments.map(v => v.id),
-        imageIds: images.map(v => v.id),
-        isAnonymous: document.getElementById("is-anonymous").checked
-    };
-
-    console.log(body);
-
-    const res = await fetch(`/api/boards/${boardId}/posts`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-    });
-
-    if (!res.ok) {
-        alert("게시글 작성 실패");
-        return;
-    }
-
-    const result = await res.json();
-
-    console.log(result);
-
-    alert("게시글 작성 완료");
-});
-</script>
+<script src="/public/js/write.js"></script>
 
 </body>
 </html>

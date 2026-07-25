@@ -64,9 +64,9 @@ export default class PostController {
         }
 
         const postService = new PostService(new PostRepository(), attachmentRepo);
-        await postService.CreatePost(user.id!, title, content, isAnonymous, board.id!, imageIds, attachmentIds);
+        const post = await postService.CreatePost(user.id!, title, content, isAnonymous, board.id!, imageIds, attachmentIds);
 
-        return res.status(201).json({ status: "success" });
+        return res.status(201).json({ status: "success", data: { postId: post.id } });
     }
 
     public static async UpdatePost(req: Request, res: Response) {

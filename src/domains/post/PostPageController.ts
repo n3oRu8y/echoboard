@@ -34,7 +34,9 @@ export default class PostPageController {
             return res.status(403).render("errors/alert.ejs", { message: "쓰기 권한이 없습니다." });
         }
 
-        return res.render("post/write.ejs");
+        return res.render("post/write.ejs", {
+            title: "게시글 작성"
+        });
     }
 
     public static async Update(req: Request, res: Response) {

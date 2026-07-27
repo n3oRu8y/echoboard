@@ -29,8 +29,76 @@
         </ul>
     </div>
 <% } %>
-    
+
+<div class="list-group">
+    <div class="list-group-item py-3">
+        <div class="d-flex justify-content-between">
+            <div>
+                <div><strong>관리자</strong> <span class="badge bg-primary">작성자</span></div>
+                <div class="text-muted small">2026-07-27 20:30</div>
+            </div>
+
+            <div>
+                <button class="btn btn-sm btn-outline-secondary reply-btn" data-comment-id="1">답글</button>
+                <button class="btn btn-sm btn-outline-danger">삭제</button>
+            </div>
+        </div>
+
+        <p class="mt-3 mb-3">댓글</p>
+
+        <div class="replies ms-4 border-start ps-3">
+
+            <div class="pb-3 border-bottom">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>관리자</strong>
+                        <span class="badge bg-primary">작성자</span>
+                        <span class="text-muted small">2026-07-27 21:14</span>
+                    </div>
+
+                    <button class="btn btn-sm btn-outline-danger">삭제</button>
+                </div>
+
+                <p class="mt-1 mb-0">대댓글 1</p>
+            </div>
+
+            <div class="pt-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>관리자</strong>
+                        <span class="text-muted small">2026-07-27 21:14</span>
+                    </div>
+
+                    <div></div>
+                </div>
+
+                <p class="mt-1 mb-0">대댓글 2</p>
+            </div>
+
+        </div>
+    </div>
 </div>
+
+<div id="reply-editor" class="card shadow-sm mt-3 d-none">
+    <div class="card-body">
+        <form id="reply-form">
+            <input type="hidden" name="commentId">
+
+            <textarea class="form-control mb-3" rows="2" name="content" placeholder="답글을 입력하세요."></textarea>
+
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <div class="form-check mb-0">
+                    <input class="form-check-input" type="checkbox" id="reply-anonymous" name="anonymous" checked>
+                    <label class="form-check-label" for="reply-anonymous">익명으로 작성</label>
+                </div>
+
+                <button type="button" class="btn btn-outline-secondary" id="reply-cancel">취소</button>
+                <button type="submit" class="btn btn-primary">답글 작성</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     const deleteBtn = document.getElementById("deleteBtn");
     deleteBtn.addEventListener("click", async e => {
@@ -48,4 +116,41 @@
             console.log("인터넷 연결 오류");
         }
     });
+
+const replyEditor = document.getElementById("reply-editor");
+const replyForm = document.getElementById("reply-form");
+const commentIdInput = replyForm.querySelector("input[name=commentId]");
+const replyTextarea = replyForm.querySelector("textarea");
+
+document.querySelectorAll(".reply-btn").forEach(button => {
+    button.addEventListener("click", () => {
+        const comment = button.closest(".list-group-item");
+
+        if (
+            replyEditor.parentElement === comment &&
+            !replyEditor.classList.contains("d-none")
+        ) {
+            replyEditor.classList.add("d-none");
+            replyForm.reset();
+            return;
+        }
+
+        const replies = comment.querySelector(".replies");
+
+        if (replies) {
+            comment.insertBefore(replyEditor, replies);
+        } else {
+            comment.appendChild(replyEditor);
+        }
+
+        commentIdInput.value = button.dataset.commentId;
+        replyEditor.classList.remove("d-none");
+        replyTextarea.focus();
+    });
+});
+
+document.getElementById("reply-cancel").addEventListener("click", () => {
+    replyEditor.classList.add("d-none");
+    replyForm.reset();
+});
 </script>

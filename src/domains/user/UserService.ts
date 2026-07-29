@@ -82,4 +82,25 @@ export default class UserService {
         user.SetNickname(nickname);
         await this.repo.Update(userId, user);
     }
+
+    public async ChangePassword(userId: string, newPassword: string, oldPassword: string | null, skipVerfiy: boolean = false) {
+        const user = await this.repo.FindByUserId(userId);
+        if (!user) {
+            throw new UserNotFound(`User with ${userId} is not found`);
+        }
+
+        if (!skipVerfiy) {
+            if (!oldPassword) {
+                throw new Error("Parameter error");
+            }
+
+            const verify = await this.VerifyPassword(oldPassword, user.password);
+            if (!verify) {
+                throw new CredentialFailed("Credential failed.");
+            }
+        }
+
+        user.password = await argon2.hash(newPassword);
+        await this.repo.Update(userId, user);
+    }
 }

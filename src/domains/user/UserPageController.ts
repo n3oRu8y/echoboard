@@ -38,4 +38,16 @@ export default class UserPageController {
             user: user,
         });
     }
-}
+
+    public static async Password(req: Request, res: Response) {
+        if (!req.session?.userId) {
+            return res.redirect("/login");
+        }
+
+        const user = await UserPageController.userService.GetUserWithUserId(req.session.userId);
+        return res.render("user/password.ejs", {
+            title: "비밀번호 변경",
+            user: user,
+        });
+    }
+};

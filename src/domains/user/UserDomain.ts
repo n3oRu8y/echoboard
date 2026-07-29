@@ -4,7 +4,7 @@ export default class User {
     constructor(
         public id: string | null,
         public readonly username: string,
-        private _password: string,
+        public password: string,
         public email: string,
         
         public nickname: string | null,
@@ -59,10 +59,6 @@ export default class User {
             row.updatedAt,
             row.deletedAt
         )
-    }
-
-    get password() {
-        return this._password;
     }
 
     get bannedUntil() {

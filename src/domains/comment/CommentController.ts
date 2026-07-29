@@ -33,7 +33,6 @@ export default class CommentController {
 
         const content = req.body.content;
         const isAnonymous = !!req.body.isAnonymous;
-        const parent = req.body.parentId;
 
         if (!content) {
             return res.status(400).json({ status: "error", message: "댓글을 입력해주세요." });
@@ -52,8 +51,9 @@ export default class CommentController {
         if (!post)
             return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });
 
-        if (parent) {
-            const comment = CommentController.commentService.Get(parent);
+        const parentId = req.body.parentId;
+        if (parentId != undefined && parentId != null) {
+            const comment = CommentController.commentService.Get(Number(parentId));
             if (!comment) 
                 return res.status(404).json({ status: "error", message: "원댓글을 찾을 수 없습니다." });
         }
@@ -64,7 +64,7 @@ export default class CommentController {
             return res.status(403).json({ status: "error", message: "차단된 사용자입니다." });
         }
 
-        CommentController.commentService.Create(req.session.userId, isAnonymous, req.body.content, post.id!, req.body.parentId);
+        CommentController.commentService.Create(req.session.userId, isAnonymous, req.body.content, post.id!, (parentId != undefined && parentId != null) ? Number(parentId) : null);
 
         return res.status(201).json({ status: "ok" });
     }

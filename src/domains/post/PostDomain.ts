@@ -1,5 +1,6 @@
 import Attachment from "../attachment/AttachmentDomain.js";
 import Board from "../board/BoardDomain.js";
+import Comment from "../comment/CommentDomain.js";
 import User from "../user/UserDomain.js";
 
 export default class Post {
@@ -8,6 +9,8 @@ export default class Post {
         public title: string,
         public content: string,
         public isAnonymous: boolean,
+
+        public comments: Array<Comment>,
         
         public authorId: string,
         public author: User | null,
@@ -29,6 +32,7 @@ export default class Post {
             title,
             content,
             isAnonymous,
+            [],
             authorId,
             null,
             boardId,
@@ -47,6 +51,7 @@ export default class Post {
             row.title,
             row.content,
             row.isAnonymous,
+            row.comments ? row.comments.map((comment: any) => Comment.FromRow(comment)) : [],
             row.authorId,
             row.author ? User.FromRow(row.author) : null,
             row.boardId,

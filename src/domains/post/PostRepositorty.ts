@@ -19,8 +19,8 @@ export default class PostRepository {
         return Post.FromRow(row);
     }
 
-    public async FindById(id: number, withAuthor: boolean = false, withBoard: boolean = false, withAttachments: boolean = false, withReactions: boolean = false) {
-        const row = await prisma.post.findUnique({
+    public async FindById(id: number, withAuthor: boolean = false, withBoard: boolean = false, withAttachments: boolean = false, withReactions: boolean = false, withComment: boolean = true) {
+        const row = await prisma.post.findFirst({
             where: {
                 id: id,
                 deletedAt: null,
@@ -28,7 +28,22 @@ export default class PostRepository {
                 author: withAuthor,
                 board: withBoard,
                 attachments: withAttachments,
-                reactions: withReactions
+                reactions: withReactions,
+                ...(withComment && {
+                    comments: {
+                        include: {
+                            author: true,
+                            replies: {
+                                include: {
+                                    author: true
+                                }
+                            }
+                        },
+                        where: {
+                            parent: null
+                        }
+                    }
+                })
             }
         });
         return row ? Post.FromRow(row) : null;

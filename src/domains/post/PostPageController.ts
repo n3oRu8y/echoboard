@@ -9,6 +9,41 @@ import PostRepository from "./PostRepositorty.js";
 import AttachmentRepository from "../attachment/AttachmentRepository.js";
 
 export default class PostPageController {
+    private static CollectAuthorMap(post: Post): Map<string, number> {
+        const authorMap = new Map<string, number>();
+        let index = 1;
+
+        const addAuthor = (author?: User | null) => {
+            if (!author || authorMap.has(author.id!)) {
+                return;
+            }
+
+            authorMap.set(author.id!, index++);
+        };
+
+        // addAuthor(post.author);
+
+        for (const comment of post.comments ?? []) {
+            if (comment.isAnonymous)
+                addAuthor(comment.author);
+
+            for (const reply of comment.replies ?? []) {
+                if (reply.isAnonymous)
+                    addAuthor(reply.author);
+            }
+        }
+
+        return authorMap;
+    }
+
+    private static getDisplayAuthor(author: User, isAnonymous: boolean, post: Post, authorMap: Map<string, number>) {
+        if (!isAnonymous) return author.nickname ?? author.username;
+
+        if (author.id === post.authorId && isAnonymous && post.isAnonymous) return "익명(작성자)";
+
+        return `익명 ${authorMap.get(author.id!)}`;
+    }
+
     public static async Write(req: Request, res: Response) {
         if (!req.session?.userId) {
             return res.redirect("/login");

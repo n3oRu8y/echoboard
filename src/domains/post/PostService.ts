@@ -71,7 +71,7 @@ export default class PostService {
     public async GetPost(postId: number, silent: true): Promise<Post | null>;
 
     public async GetPost(postId: number, silent: boolean = false) {
-        const post = await this.postRepo.FindById(postId, true, true, true, true);
+        const post = await this.postRepo.FindById(postId, true, true, true, true, true);
         if (!post && !silent) {
             throw new PostNotFound(`Could not find a post with the id ${postId}.`);
         }

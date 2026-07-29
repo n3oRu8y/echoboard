@@ -1,51 +1,47 @@
-<form id="register-form">
-    <div>
-        <label for="email">이메일</label>
-        <input type="email" name="email">
+<form id="register-form" class="card shadow-sm p-4 mx-auto" style="max-width: 450px;">
+    <h2 class="text-center mb-4">회원가입</h2>
+
+    <div class="mb-3">
+        <label for="email" class="form-label">이메일</label>
+        <input
+            type="email"
+            class="form-control"
+            id="email"
+            name="email"
+            placeholder="example@email.com"
+            required>
     </div>
 
-    <div>
-        <label for="username">아이디</label>
-        <input type="text" name="username">
+    <div class="mb-3">
+        <label for="username" class="form-label">아이디</label>
+        <input
+            type="text"
+            class="form-control"
+            id="username"
+            name="username"
+            placeholder="아이디를 입력하세요"
+            required>
     </div>
 
-    <div>
-        <label for="password">비밀번호</label>
-        <input type="password" name="password">
+    <div class="mb-4">
+        <label for="password" class="form-label">비밀번호</label>
+        <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+            placeholder="비밀번호를 입력하세요"
+            required>
     </div>
 
-    <button type="submit">회원가입</button>
+    <div class="h-captcha" data-sitekey="<%= sitekey %>"></div>
+
+    <button type="submit" class="btn btn-primary w-100">
+        회원가입
+    </button>
 </form>
 <script>
-    const registerForm = document.getElementById("register-form");
-    registerForm.addEventListener("submit", async e => {
-        e.preventDefault();
-        const formData = new FormData(registerForm);
-
-        try {
-            const res = await fetch("/api/auth/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email: formData.get("email")?.toString().trim(),
-                    username: formData.get("username")?.toString().trim(),
-                    password: formData.get("password")?.toString().trim()
-                })
-            });
-
-            if (!res.ok) {
-                const data = await res.json();
-                return alert(data.message);
-            }
-
-            return location.href = "/";
-        } catch (e) {
-            if (e instanceof SyntaxError) {
-                return alert("서버 응답 오류");
-            }
-            alert(e);
-        }
-    });
+    const sitekey = "<%= sitekey %>"
 </script>
+<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+<script src="/public/js/register.js"></script>

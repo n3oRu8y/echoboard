@@ -6,6 +6,7 @@ import type AttachmentRepository from "../attachment/AttachmentRepository.js";
 import PostNotFound from "./exceptions/PostNotFound.js";
 import Post from "./PostDomain.js";
 import type PostRepository from "./PostRepositorty.js";
+import type User from "../user/UserDomain.js";
 
 const safe = (content: string) => sanitize(content, {
     allowedTags: sanitize.defaults.allowedTags.concat(["img"]),
@@ -52,13 +53,13 @@ export default class PostService {
         });
     }
 
-    public async DeletePost(postId: number, userId: string, now: Date = new Date()) {
+    public async DeletePost(postId: number, user: User, now: Date = new Date()) {
         const post = await this.postRepo.FindById(postId);
         if (!post) {
             throw new PostNotFound(`Could not find a post with the id ${postId}.`);
         }
 
-        if (post.authorId != userId) {
+        if (post.authorId != user.id && user.role != "ADMIN") {
             throw new CredentialFailed("Only the author or the administrator can delete this post.");
         }
 

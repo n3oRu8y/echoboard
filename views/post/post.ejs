@@ -30,6 +30,39 @@
     </div>
 <% } %>
 
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-3">댓글 작성</h5>
+
+        <form id="comment-form">
+            <textarea
+                class="form-control mb-3"
+                name="content"
+                rows="3"
+                placeholder="댓글을 입력하세요."
+                required></textarea>
+
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <div class="form-check mb-0">
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="comment-anonymous"
+                        name="anonymous"
+                        checked>
+                    <label class="form-check-label" for="comment-anonymous">
+                        익명으로 작성
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    댓글 작성
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="list-group">
     <div class="list-group-item py-3">
         <div class="d-flex justify-content-between">
@@ -117,40 +150,69 @@
         }
     });
 
-const replyEditor = document.getElementById("reply-editor");
-const replyForm = document.getElementById("reply-form");
-const commentIdInput = replyForm.querySelector("input[name=commentId]");
-const replyTextarea = replyForm.querySelector("textarea");
+    const commentForm = document.getElementById("comment-form");
+    commentForm.addEventListener("submit", async e => {
+        e.preventDefault();
+        const formData = new FormData(commentForm);
 
-document.querySelectorAll(".reply-btn").forEach(button => {
-    button.addEventListener("click", () => {
-        const comment = button.closest(".list-group-item");
+        try {
+            const res = await fetch("/api/boards/<%= post.board.url %>/posts/<%= post.id %>/comments", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    content: formData.get("content")?.toString().trim(),
+                    parent: null,
+                    isAnonymous: formData.has("anonymous")
+                })
+            });
 
-        if (
-            replyEditor.parentElement === comment &&
-            !replyEditor.classList.contains("d-none")
-        ) {
-            replyEditor.classList.add("d-none");
-            replyForm.reset();
-            return;
+            if (!res.ok) {
+                const data = await res.json();
+                return alert(data.message);
+            }
+
+            location.reload();
+        } catch {
+            alert("인터넷 연결 상태를 확인해주세요.");
         }
+    })
 
-        const replies = comment.querySelector(".replies");
+    const replyEditor = document.getElementById("reply-editor");
+    const replyForm = document.getElementById("reply-form");
+    const commentIdInput = replyForm.querySelector("input[name=commentId]");
+    const replyTextarea = replyForm.querySelector("textarea");
 
-        if (replies) {
-            comment.insertBefore(replyEditor, replies);
-        } else {
-            comment.appendChild(replyEditor);
-        }
+    document.querySelectorAll(".reply-btn").forEach(button => {
+        button.addEventListener("click", () => {
+            const comment = button.closest(".list-group-item");
 
-        commentIdInput.value = button.dataset.commentId;
-        replyEditor.classList.remove("d-none");
-        replyTextarea.focus();
+            if (
+                replyEditor.parentElement === comment &&
+                !replyEditor.classList.contains("d-none")
+            ) {
+                replyEditor.classList.add("d-none");
+                replyForm.reset();
+                return;
+            }
+
+            const replies = comment.querySelector(".replies");
+
+            if (replies) {
+                comment.insertBefore(replyEditor, replies);
+            } else {
+                comment.appendChild(replyEditor);
+            }
+
+            commentIdInput.value = button.dataset.commentId;
+            replyEditor.classList.remove("d-none");
+            replyTextarea.focus();
+        });
     });
-});
 
-document.getElementById("reply-cancel").addEventListener("click", () => {
-    replyEditor.classList.add("d-none");
-    replyForm.reset();
-});
+    document.getElementById("reply-cancel").addEventListener("click", () => {
+        replyEditor.classList.add("d-none");
+        replyForm.reset();
+    });
 </script>

@@ -7,6 +7,9 @@ import dayjs from "dayjs";
 import PostService from "./PostService.js";
 import PostRepository from "./PostRepositorty.js";
 import AttachmentRepository from "../attachment/AttachmentRepository.js";
+import FormatDatetime from "../../common/utils/FormatDatetime.js";
+import type Post from "./PostDomain.js";
+import type User from "../user/UserDomain.js";
 
 export default class PostPageController {
     private static CollectAuthorMap(post: Post): Map<string, number> {
@@ -150,9 +153,19 @@ export default class PostPageController {
         if (!post)
             return res.status(404).render("errors/404.ejs");
 
+        const authorMap = PostPageController.CollectAuthorMap(post);
+        for(let comment of post.comments) {
+            comment.displayNick = PostPageController.getDisplayAuthor(comment.author!, comment.isAnonymous, post, authorMap);
+            for(let reply of comment.replies!) {
+                reply.displayNick = PostPageController.getDisplayAuthor(reply.author!, reply.isAnonymous, post, authorMap);
+            }
+        }
+
         return res.render("post/post.ejs", {
             post: post,
-            user: user
+            user: user,
+            authorMap: authorMap,
+            DateFormat: FormatDatetime
         });
     }
 }

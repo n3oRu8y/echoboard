@@ -30,85 +30,88 @@
     </div>
 <% } %>
 
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
-        <h5 class="card-title mb-3">댓글 작성</h5>
+<% if (user) { %>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">댓글 작성</h5>
 
-        <form id="comment-form">
-            <textarea
-                class="form-control mb-3"
-                name="content"
-                rows="3"
-                placeholder="댓글을 입력하세요."
-                required></textarea>
+            <form id="comment-form">
+                <textarea
+                    class="form-control mb-3"
+                    name="content"
+                    rows="3"
+                    placeholder="댓글을 입력하세요."
+                    required></textarea>
 
-            <div class="d-flex justify-content-end align-items-center gap-3">
-                <div class="form-check mb-0">
-                    <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="comment-anonymous"
-                        name="anonymous"
-                        checked>
-                    <label class="form-check-label" for="comment-anonymous">
-                        익명으로 작성
-                    </label>
+                <div class="d-flex justify-content-end align-items-center gap-3">
+                    <div class="form-check mb-0">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="comment-anonymous"
+                            name="anonymous"
+                            checked>
+                        <label class="form-check-label" for="comment-anonymous">
+                            익명으로 작성
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        댓글 작성
+                    </button>
                 </div>
-
-                <button type="submit" class="btn btn-primary">
-                    댓글 작성
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
+<% } %>
 
 <div class="list-group">
     <div class="list-group-item py-3">
-        <div class="d-flex justify-content-between">
-            <div>
-                <div><strong>관리자</strong> <span class="badge bg-primary">작성자</span></div>
-                <div class="text-muted small">2026-07-27 20:30</div>
-            </div>
-
-            <div>
-                <button class="btn btn-sm btn-outline-secondary reply-btn" data-comment-id="1">답글</button>
-                <button class="btn btn-sm btn-outline-danger">삭제</button>
-            </div>
-        </div>
-
-        <p class="mt-3 mb-3">댓글</p>
-
-        <div class="replies ms-4 border-start ps-3">
-
-            <div class="pb-3 border-bottom">
-                <div class="d-flex justify-content-between align-items-start">
+        <% if (post.comments.length > 0) { %>
+            <% post.comments.forEach(comment => { %>
+                <div class="d-flex justify-content-between">
                     <div>
-                        <strong>관리자</strong>
-                        <span class="badge bg-primary">작성자</span>
-                        <span class="text-muted small">2026-07-27 21:14</span>
+                        <div><strong><%= comment.displayNick %></strong> <% if (!post.isAnonymous && !comment.isAnonymous && post.authorId == comment.authorId) { %><span class="badge bg-primary">작성자</span><% } %></div>
+                        <div class="text-muted small"><%= DateFormat(comment.createdAt) %></div>
                     </div>
-
-                    <button class="btn btn-sm btn-outline-danger">삭제</button>
-                </div>
-
-                <p class="mt-1 mb-0">대댓글 1</p>
-            </div>
-
-            <div class="pt-3">
-                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <strong>관리자</strong>
-                        <span class="text-muted small">2026-07-27 21:14</span>
+                        <% if (user) { %>
+                            <button class="btn btn-sm btn-outline-secondary reply-btn" data-comment-id="1">답글</button>
+                            <% if (comment.author.id == user?.id) { %>
+                                <button class="btn btn-sm btn-outline-danger">삭제</button>
+                            <% } %>
+                        <% } %>
                     </div>
-
-                    <div></div>
                 </div>
+                <p class="mt-3 mb-3"><%= comment.content %></p>
 
-                <p class="mt-1 mb-0">대댓글 2</p>
-            </div>
+                <% if (comment.replies.length > 0) { %>
+                    <div class="replies ms-4 border-start ps-3">
+                        <% comment.replies.ForEach(reply => { %>
+                            <div class="pb-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong><%= reply.displayNick %></strong>
+                                        <% if (!post.isAnonymous && !reply.isAnonymous && reply.authorId == post.authorId) { %>
+                                            <span class="badge bg-primary">작성자</span>
+                                        <% } %>
+                                        <span class="text-muted small"><%= DateFormat(reply.createdAt) %></span>
+                                    </div>
 
-        </div>
+                                    <% if (reply.author.id == user?.id) { %>
+                                        <button class="btn btn-sm btn-outline-danger">삭제</button>
+                                    <% } %>
+                                </div>
+
+                                <p class="mt-1 mb-0"><%= reply.content %></p>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+            <% }); %>
+        <% } else { %>
+            <p>작성된 댓글이 없습니다.</p>
+        <% } %>
     </div>
 </div>
 
@@ -134,7 +137,7 @@
 
 <script>
     const deleteBtn = document.getElementById("deleteBtn");
-    deleteBtn.addEventListener("click", async e => {
+    deleteBtn?.addEventListener("click", async e => {
         if (!confirm("게시글을 삭제하겠습니까?")) return;
         try {
             const res = await fetch("/api/boards/<%= post.board.url %>/posts/<%= post.id %>", { method: "DELETE" });
@@ -177,7 +180,7 @@
         } catch {
             alert("인터넷 연결 상태를 확인해주세요.");
         }
-    })
+    });
 
     const replyEditor = document.getElementById("reply-editor");
     const replyForm = document.getElementById("reply-form");

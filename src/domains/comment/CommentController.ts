@@ -102,7 +102,7 @@ export default class CommentController {
             return res.status(401).json({ status: "error", message: "로그인해주세요." });
         }
 
-        if (user.role != "ADMIN" || comment.authorId != user.id) {
+        if (user.role != "ADMIN" && comment.authorId != user.id) {
             return res.status(403).json({ status: "error", message: "권한이 없습니다." });
         }
 

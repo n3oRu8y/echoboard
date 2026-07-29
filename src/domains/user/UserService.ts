@@ -72,4 +72,14 @@ export default class UserService {
         user.deletedAt = now;
         await this.repo.Update(userId, user);
     }
+
+    public async ChangeNickname(userId: string, nickname: string) {
+        const user = await this.repo.FindByUserId(userId);
+        if (!user) {
+            throw new UserNotFound(`User with ${userId} is not found`);
+        }
+
+        user.SetNickname(nickname);
+        await this.repo.Update(userId, user);
+    }
 }

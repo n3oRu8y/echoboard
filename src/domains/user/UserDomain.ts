@@ -1,3 +1,5 @@
+import ValidationException from "../../common/exceptions/ValidationException.js";
+
 export default class User {
     constructor(
         public id: string | null,
@@ -86,5 +88,12 @@ export default class User {
 
     IsBanned(now: Date = new Date()): boolean {
         return !!this._bannedUntil && now < this._bannedUntil;
+    }
+
+    public SetNickname(nickname: string) {
+        const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,12}$/;
+        if (!nicknameRegex.test(nickname))
+            throw new ValidationException("Validation failed");
+        this.nickname = nickname;
     }
 }

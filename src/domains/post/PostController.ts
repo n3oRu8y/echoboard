@@ -103,7 +103,7 @@ export default class PostController {
         const attachmentRepo = new AttachmentRepository();
         const attachmentService = new AttachmentService(attachmentRepo);
         const attachments = await attachmentService.GetAttachments(attachmentIds);
-        for(const attachment of attachmentIds) {
+        for(const attachment of attachments) {
             sumOfSize += attachment.size;
         }
 

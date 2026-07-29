@@ -33,19 +33,21 @@
 
                 <div class="list-group">
                     <% post.attachments.forEach(attachment => { %>
-                        <a
-                            href="/api/attachments/<%= attachment.id %>"
-                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <% if (!attachment.isImage) { %>
+                            <a
+                                href="/api/attachments/<%= attachment.id %>"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
 
-                            <span>
-                                <i class="bi bi-paperclip me-2"></i>
-                                <%= attachment.fileName %>
-                            </span>
+                                <span>
+                                    <i class="bi bi-paperclip me-2"></i>
+                                    <%= attachment.fileName %>
+                                </span>
 
-                            <span class="badge bg-secondary">
-                                다운로드
-                            </span>
-                        </a>
+                                <span class="badge bg-secondary">
+                                    다운로드
+                                </span>
+                            </a>
+                        <% } %>
                     <% }); %>
                 </div>
             </div>

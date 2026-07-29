@@ -165,7 +165,8 @@ export default class PostPageController {
             post: post,
             user: user,
             authorMap: authorMap,
-            DateFormat: FormatDatetime
+            DateFormat: FormatDatetime,
+            title: post.title
         });
     }
 }

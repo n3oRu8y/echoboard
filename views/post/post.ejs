@@ -1,34 +1,77 @@
 <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
-<h1><%= post.title %></h1>
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
 
-<p>작성자: <%= post.isAnonymous ? "익명" : post.author.nickname %></p>
+        <h2 class="mb-3"><%= post.title %></h2>
 
-<div class="post-content">
-    <%- post.content %>
-</div>
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+            <div>
+                <strong><%= post.isAnonymous ? "익명" : post.author.nickname %></strong>
 
-<div>
-    <% if (post.author.id == user?.id) { %>
-        <a href="/boards/<%= post.board.url %>/<%= post.id %>/edit">수정</a>
-    <% } if (post.author.id == user?.id || user?.role == "ADMIN") { %>
-        <btn id="deleteBtn">삭제</btn>
-    <% } %>
-</div>
+                <% if (post.author.role == "ADMIN" && !post.isAnonymous) { %>
+                    <span class="badge bg-danger ms-1">관리자</span>
+                <% } %>
+            </div>
 
-<% if (post.attachments.length > 0) { %>
-    <div>
-        <ul>
-            <% post.attachments.forEach(attachment => { %>
-                <li>
-                    <p><%= attachment.fileName %></p>
-                    <a href="/api/attachments/<%= attachment.id %>">다운로드</a>
-                </li>
-            <% }); %> 
-        </ul>
+            <small class="text-muted">
+                <%= DateFormat(post.createdAt) %>
+            </small>
+        </div>
+
+        <div class="post-content rounded p-3 mb-4" style="min-height: 300px;">
+            <%- post.content %>
+        </div>
+
+        <% if (post.attachments.length > 0) { %>
+            <div class="border-top pt-4">
+                <h6 class="mb-3">
+                    첨부파일
+                    <span class="text-secondary">(<%= post.attachments.length %>)</span>
+                </h6>
+
+                <div class="list-group">
+                    <% post.attachments.forEach(attachment => { %>
+                        <a
+                            href="/api/attachments/<%= attachment.id %>"
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+
+                            <span>
+                                <i class="bi bi-paperclip me-2"></i>
+                                <%= attachment.fileName %>
+                            </span>
+
+                            <span class="badge bg-secondary">
+                                다운로드
+                            </span>
+                        </a>
+                    <% }); %>
+                </div>
+            </div>
+        <% } %>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <a href="/boards/<%= post.board.url %>" class="btn btn-outline-secondary">
+                ← 목록으로
+            </a>
+
+            <div>
+                <% if (post.author.id == user?.id) { %>
+                    <a href="/boards/<%= post.board.url %>/<%= post.id %>/edit" class="btn btn-outline-primary">
+                        수정
+                    </a>
+                <% } %>
+
+                <% if (post.author.id == user?.id || user?.role == "ADMIN") { %>
+                    <button id="deleteBtn" class="btn btn-outline-danger">
+                        삭제
+                    </button>
+                <% } %>
+            </div>
+        </div>
     </div>
-<% } %>
+</div>
 
 <% if (user) { %>
     <div class="card shadow-sm mb-4">

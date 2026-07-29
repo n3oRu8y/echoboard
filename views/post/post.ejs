@@ -78,7 +78,7 @@
                         <% if (user) { %>
                             <button class="btn btn-sm btn-outline-secondary reply-btn" data-comment-id="1">답글</button>
                             <% if (comment.author.id == user?.id) { %>
-                                <button class="btn btn-sm btn-outline-danger">삭제</button>
+                                <button id="delete-comment-btn" class="btn btn-sm btn-outline-danger" data-comment-id="<%= comment.id %>">삭제</button>
                             <% } %>
                         <% } %>
                     </div>
@@ -99,7 +99,7 @@
                                     </div>
 
                                     <% if (reply.author.id == user?.id) { %>
-                                        <button class="btn btn-sm btn-outline-danger">삭제</button>
+                                        <button id="delete-comment-btn" class="btn btn-sm btn-outline-danger" data-comment-id="<%= reply.id %>">삭제</button>
                                     <% } %>
                                 </div>
 
@@ -180,6 +180,26 @@
         } catch {
             alert("인터넷 연결 상태를 확인해주세요.");
         }
+    });
+
+    document.querySelectorAll("#delete-comment-btn").forEach(btn => {
+        btn.addEventListener("click", async e => {
+            if (!confirm("댓글을 삭제하시겠습니까?"))
+                return;
+
+            const commentId = btn.dataset.commentId;
+            try {
+                const res = await fetch(`/api/boards/<%= post.board.url %>/posts/<%= post.id %>/comments/${commentId}`, { method: "DELETE" });
+                if (!res.ok) {
+                    const data = await res.json();
+                    return alert(data.message);
+                }
+                alert("댓글이 삭제되었습니다.");
+                location.reload();
+            } catch {
+                alert("인터넷 연결 상태를 확인해주세요.");
+            }
+        });
     });
 
     const replyEditor = document.getElementById("reply-editor");

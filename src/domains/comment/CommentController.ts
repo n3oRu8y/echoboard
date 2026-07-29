@@ -68,4 +68,49 @@ export default class CommentController {
 
         return res.status(201).json({ status: "ok" });
     }
+
+    public static async Delete(req: Request, res: Response) {
+        if (!req.session?.userId) {
+            return res.status(401).json({ status: "error", message: "로그인해주세요." });
+        }
+
+        const board = await CommentController.boardService.GetByUrl(req.params.boardUrl as string, true);
+        if (!board) {
+            return res.status(404).json({ status: "error", message: "게시판을 찾을 수 없습니다." });
+        }
+
+        const postId = Number(req.params.postId);
+        if (!Number.isInteger(postId) || postId < 0) 
+            return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });
+
+        const post = await CommentController.postService.GetPost(postId, true);
+        if (!post)
+            return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });
+
+        const commentId = Number(req.params.commentId);
+        if (!Number.isInteger(commentId) || commentId < 0) {
+            return res.status(404).json({ status: "error", message: "댓글을 찾을 수 없습니다." });
+        }
+        
+        const comment = await CommentController.commentRepo.FindById(commentId);
+        if (!comment) {
+            return res.status(404).json({ status: "error", message: "댓글을 찾을 수 없습니다." });
+        }
+
+        const user = await CommentController.userService.GetUserWithUserId(req.session.userId);
+        if (!user) {
+            return res.status(401).json({ status: "error", message: "로그인해주세요." });
+        }
+
+        if (user.role != "ADMIN" || comment.authorId != user.id) {
+            return res.status(403).json({ status: "error", message: "권한이 없습니다." });
+        }
+
+        const success = await CommentController.commentService.Delete(commentId, true);
+        if (!success) {
+            return res.status(500).json({ status: "error", message: "댓글 삭제를 실패하였습니다." });
+        }
+
+        return res.status(200).json({ status: "success" });
+    }
 }

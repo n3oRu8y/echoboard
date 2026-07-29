@@ -26,4 +26,16 @@ export default class UserPageController {
             Format: UserPageController.Format
         });
     }
+
+    public static async Nickname(req: Request, res: Response) {
+        if (!req.session?.userId) {
+            return res.redirect("/login");
+        }
+
+        const user = await UserPageController.userService.GetUserWithUserId(req.session.userId);
+        return res.render("user/nickname.ejs", {
+            title: "닉네임 변경",
+            user: user,
+        });
+    }
 }

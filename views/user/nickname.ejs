@@ -1,0 +1,42 @@
+<div class="container mt-5">
+    <div class="card shadow p-4 mx-auto" style="max-width: 450px;">
+        <h2 class="text-center mb-4">닉네임 변경</h2>
+
+        <form id="nickname-form">
+            <div class="mb-3">
+                <label class="form-label">현재 닉네임</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    value="<%= user.nickname %>"
+                    readonly>
+            </div>
+
+            <div class="mb-4">
+                <label for="nickname" class="form-label">
+                    새 닉네임
+                </label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="nickname"
+                    name="nickname"
+                    placeholder="새 닉네임 입력"
+                    maxlength="12"
+                    required>
+
+                <div class="form-text">
+                    2~12자의 닉네임을 입력해주세요.
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                변경하기
+            </button>
+        </form>
+
+        <a href="/mypage" class="btn btn-outline-secondary w-100 mt-3">
+            돌아가기
+        </a>
+    </div>
+</div>

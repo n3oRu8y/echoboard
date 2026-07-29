@@ -36,6 +36,14 @@ export default class AuthController {
             return res.status(401).json({ status: "error", message: "이메일, 아이디, 비밀번호를 입력해주세요. "});
         }
 
+        const usernameRegex = /^[a-z][a-z0-9_]{3,19}$/;
+
+        if (!usernameRegex.test(username)) {
+            return res.status(400).json({
+                message: "아이디는 영문 소문자로 시작하며, 영문 소문자, 숫자, _(언더바)만 사용할 수 있고 4~20자여야 합니다."
+            });
+        }
+
         try {
             const userService = await new UserService(new UserRepo());
             await userService.Register(username, password, email);

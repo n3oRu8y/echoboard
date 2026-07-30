@@ -1,0 +1,61 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-4 text-center">
+                        2단계 인증 설정
+                    </h2>
+
+                    <p class="text-muted text-center">
+                        인증 앱(Google Authenticator, Microsoft Authenticator 등)을 사용하여
+                        QR 코드를 등록하세요.
+                    </p>
+
+                    <div class="text-center my-4">
+                        <img 
+                            src="<%= qrCode %>" 
+                            alt="TOTP QR Code"
+                            class="img-fluid border rounded p-2"
+                            style="max-width: 250px;"
+                        >
+                    </div>
+
+                    <div class="alert alert-secondary">
+                        <small>
+                            QR 코드를 스캔할 수 없는 경우 아래 키를 직접 입력하세요.
+                        </small>
+
+                        <div class="mt-2">
+                            <code class="user-select-all">
+                                <%= secret %>
+                            </code>
+                        </div>
+                    </div>
+
+
+                    <form id="two-fa-enable-form">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                인증 코드
+                            </label>
+                            <input type="hidden" name="secret" value="<%= secret %>">
+                            <input
+                                type="text"
+                                class="form-control text-center"
+                                name="token"
+                                placeholder="6자리 코드 입력"
+                                maxlength="6"
+                                pattern="[0-9]{6}"
+                                required
+                            >
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">2단계 인증 활성화</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/public/js/2fa.js"></script>

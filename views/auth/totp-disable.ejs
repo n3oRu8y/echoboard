@@ -1,0 +1,40 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-danger">
+                <div class="card-body">
+                    <h2 class="card-title mb-4 text-center text-danger">
+                        2단계 인증 해제
+                    </h2>
+
+                    <div class="alert alert-warning">
+                        <strong>주의</strong><br>
+                        2단계 인증을 해제하면 계정 보호 수준이 낮아집니다.
+                        계속 진행하려면 현재 인증 앱의 코드를 입력하세요.
+                    </div>
+
+                    <form id="two-fa-disable-form">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                인증 코드
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control text-center"
+                                name="token"
+                                placeholder="6자리 코드 입력"
+                                maxlength="6"
+                                pattern="[0-9]{6}"
+                                autocomplete="one-time-code"
+                                required
+                            >
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100"> 2단계 인증 해제</button>
+                    </form>
+                    <a href="/mypage" class="btn btn-outline-secondary w-100 mt-3">취소</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/public/js/2fa.js"></script>

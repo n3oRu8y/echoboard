@@ -21,8 +21,7 @@ export default class UserPageController {
             return res.redirect("/login");
         }
 
-        const user = await UserPageController.userService.GetUserWithUserId(req.session.userId);
-
+        const user = await UserPageController.userService.GetUserWithUserId(req.session.userId, false, true);
         return res.render("user/mypage.ejs", {
             title: "마이페이지",
             user: user,

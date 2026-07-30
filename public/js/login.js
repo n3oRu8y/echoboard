@@ -17,16 +17,21 @@ loginForm.addEventListener("submit", async e => {
             })
         });
 
+        const data = await res.json();
+
         if (!res.ok) {
-            const data = await res.json();
             return alert(data.message);
         }
 
         const redirect = new URLSearchParams(location.search).get("redirect");
 
         if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
+            if (data.message == "pending")
+                return location.href = `/login/2fa?redirect=${redirect}`;
             location.href = redirect;
         } else {
+            if (data.message == "pending")
+                return location.href = "/login/2fa";
             location.href = "/";
         }
     } catch {

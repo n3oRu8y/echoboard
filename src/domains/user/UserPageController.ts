@@ -64,12 +64,14 @@ export default class UserPageController {
             const result = await UserPageController.totpService.CreateSecret(user.id!, user.email);
             const qrCode = await QRCode.toDataURL(result.uri);
             return res.render("auth/totp-register.ejs", {
-                title: "2단계 인증 등록",
+                title: "2단계 인증 설정",
                 qrCode: qrCode,
                 secret: result.secret
             });
         } else {
-            return res.render("auth/totp-disable.ejs");
+            return res.render("auth/totp-disable.ejs", {
+                title: "2단계 인증 설정"
+            });
         }
     }
 };

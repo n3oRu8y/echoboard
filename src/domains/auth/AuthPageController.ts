@@ -35,7 +35,9 @@ export default class AuthPageController {
         const token = req.cookies.pd;
         try {
             const decoded = jwt.verify(token, JWT_SECRET);
-            return res.render("auth/totp-verify.ejs");
+            return res.render("auth/totp-verify.ejs", {
+                title: "2단계 인증"
+            });
         } catch {
             return res.redirect("/");
         }

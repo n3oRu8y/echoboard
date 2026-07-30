@@ -57,14 +57,14 @@ export default class UserService {
         return user;
     }
 
-    public async Withraw(userId: string, password: string) {
-        const user = await this.repo.FindByUsername(userId);
+    public async Withraw(userId: string, password: string, isAdminAction: boolean) {
+        const user = await this.repo.FindByUserId(userId);
         if (!user) {
             throw new UserNotFound(`User with ${userId} is not found`);
         }
 
         const verified = await this.VerifyPassword(password, user.password);
-        if (!verified) {
+        if (!verified && !isAdminAction) {
             throw new CredentialFailed("Invalid password");
         }
 

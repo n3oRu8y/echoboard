@@ -69,7 +69,8 @@ export default class UserRepo {
     async FindByUsername(username: string): Promise<User | null> {
         const row = await prisma.user.findFirst({
             where: {
-                username: username
+                username: username,
+                deletedAt: null
             }
         });
         return row ? User.FromRow(row) : null;
@@ -78,7 +79,8 @@ export default class UserRepo {
     async FindByUserId(userId: string, withFk: boolean = false): Promise<User | null> {
         const row = await prisma.user.findFirst({
             where: {
-                id: userId
+                id: userId,
+                deletedAt: null
             }, 
             ...(withFk && {
                 include: {

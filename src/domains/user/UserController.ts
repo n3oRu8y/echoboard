@@ -3,6 +3,7 @@ import UserRepo from "./UserRepository.js";
 import UserService from "./UserService.js";
 import ValidationException from "../../common/exceptions/ValidationException.js";
 import CredentialFailed from "../../common/exceptions/CredentialFailed.js";
+import UserNotFound from "./exceptions/UserNotFound.js";
 
 export default class UserControler {
     private constructor() {};
@@ -70,4 +71,43 @@ export default class UserControler {
 
         return res.status(201).json({ status: "success" });
     } 
+
+    public static async DeleteUser(req: Request, res: Response) {
+        if (!req.session.userId) {
+            return res.status(401).json({ status: "error", message: "로그인 해주세요." });
+        }
+
+        let targetId = req.params.userId as string;
+        const user = await UserControler.userService.GetUserWithUserId(req.session?.userId);
+        if (targetId == user.id) {
+            return res.status(401).json({ status: "error", message: "자기 자신을 강제탈퇴시킬 수 없습니다." });
+        }
+
+        if (targetId != "me" && req.session?.userId) {
+            return res.status(403).json({ status: "error", message: "권한이 없습니다." });
+        }
+    
+        const isAdminAction = targetId != "me" ? true : false;
+        if (targetId == "me") {
+            targetId = req.session.userId;
+        }
+
+        const password = req.body.password ?? "";
+        if (!password && !isAdminAction) {
+            return res.status(400).json({ status: "error", message: "비밀번호를 입력해주세요."});
+        }
+
+        try {
+            await UserControler.userService.Withraw(targetId, password, isAdminAction);
+        } catch (e) {
+            if (e instanceof UserNotFound) {
+                return res.status(404).json({ status: "error", message: "유저를 찾을 수 없습니다." });
+            } else if (e instanceof CredentialFailed) {
+                return res.status(403).json({ status: "error", message: "비밀번호를 확인해주세요." });
+            }
+            throw e;
+        }
+
+        return res.status(200).json({ status: "error" });
+    }
 }

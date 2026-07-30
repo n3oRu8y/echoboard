@@ -53,7 +53,7 @@ app.use(AuthMiddleware);
 
 app.use((req, res, next) => {
     res.locals.title = "오류";
-    res.locals.user = req.session.user;
+    res.locals.user = req.session?.user;
     next();
 });
 

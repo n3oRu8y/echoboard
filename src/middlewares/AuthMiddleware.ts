@@ -17,6 +17,7 @@ export default async function AuthMiddleware(req: Request, res: Response, next: 
                     }
                 });
             });
+            return next();
         }
 
         req.session.user = user;

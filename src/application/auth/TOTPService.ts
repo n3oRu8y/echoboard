@@ -3,7 +3,6 @@ import { generateSecret, generateURI, verify } from "otplib";
 import type UserRepo from "../../domains/user/UserRepository.js";
 import UserNotFound from "../../domains/user/exceptions/UserNotFound.js";
 import CredentialFailed from "../../common/exceptions/CredentialFailed.js";
-import ValidationException from "../../common/exceptions/ValidationException.js";
 
 export class TOTPResult {
     public secret: string;

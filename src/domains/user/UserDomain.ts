@@ -52,8 +52,8 @@ export default class User {
             row.role,
             row.bannedUntil,
             row.banReason,
-            row._twoFactorEnabled,
-            row._twoFactorSecret,
+            row.twoFactorEnabled,
+            row.twoFactorSecret,
             row.lastLoginAt,
             row.createdAt,
             row.updatedAt,
@@ -75,6 +75,20 @@ export default class User {
 
     get twoFactorSecret() {
         return this._twoFactorSecret;
+    }
+
+    set twoFactorEnabled(value: boolean) {
+        if (!this.twoFactorSecret) {
+            throw new Error("TOTP is not configured");
+        }
+        this._twoFactorEnabled = value;
+    }
+
+    set twoFactorSecret(value: string | null) {
+        if (this.twoFactorEnabled && !value) {
+            throw new Error("TOTP is configured");
+        }
+        this._twoFactorSecret = value;
     }
 
     Ban(until: Date, reason: string | null = null) {

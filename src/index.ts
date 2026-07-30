@@ -2,6 +2,7 @@ import { RedisStore } from "connect-redis";
 import express from "express";
 import session from "express-session";
 import http from "http";
+import cookieParser from "cookie-parser";
 import redisClient from "./db/redis.js";
 import path from "path";
 import expressLayouts from "express-ejs-layouts";
@@ -45,6 +46,8 @@ app.use(express.urlencoded({
     extended: true,
     limit: "50mb"
 }));
+
+app.use(cookieParser());
 
 app.use(AuthMiddleware);
 

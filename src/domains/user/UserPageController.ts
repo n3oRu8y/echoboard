@@ -73,4 +73,12 @@ export default class UserPageController {
             });
         }
     }
+
+    public static async WithdrawPage(req: Request, res: Response) {
+        if (!req.session?.userId) {
+            return res.redirect("/login");
+        }
+
+        return res.render("user/withdraw.ejs", { title: "회원탈퇴" });
+    }
 };

@@ -1,0 +1,79 @@
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-danger text-white">
+                <h3 class="mb-0">회원탈퇴</h3>
+            </div>
+
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h5 class="alert-heading">탈퇴 전 꼭 확인해주세요.</h5>
+                    <ul class="mb-0">
+                        <li>회원탈퇴 후 계정은 복구할 수 없습니다.</li>
+                        <li>작성한 게시글 및 댓글은 삭제되지 않을 수 있습니다.</li>
+                        <li>동일한 아이디로 재가입이 제한될 수 있습니다.</li>
+                    </ul>
+                </div>
+
+                <form id="withdraw-form">
+
+                    <div class="mb-3">
+                        <label class="form-label">아이디</label>
+                        <input type="text" class="form-control" value="user01" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">비밀번호 확인</label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            placeholder="비밀번호를 입력하세요">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">탈퇴 사유 (선택)</label>
+                        <select class="form-select">
+                            <option selected>선택하세요</option>
+                            <option>서비스 이용이 불편합니다.</option>
+                            <option>원하는 기능이 없습니다.</option>
+                            <option>다른 서비스를 이용합니다.</option>
+                            <option>개인정보 보호</option>
+                            <option>기타</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">추가 의견 (선택)</label>
+                        <textarea
+                            class="form-control"
+                            rows="4"
+                            placeholder="의견을 입력해주세요."></textarea>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="agree">
+                        <label class="form-check-label" for="agree">
+                            안내사항을 모두 확인했으며 회원탈퇴에 동의합니다.
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="/mypage" class="btn btn-secondary">
+                            취소
+                        </a>
+
+                        <button type="submit" class="btn btn-danger">
+                            회원탈퇴
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/public/js/withdraw.js"></script>

@@ -9,7 +9,7 @@ import expressLayouts from "express-ejs-layouts";
 import routes from "./routes/index.js";
 import AuthMiddleware from "./middlewares/AuthMiddleware.js";
 
-const PORT = process.env.PORT;
+const PORT = Number(process.env.PORT) || 3000;
 const SESSION_SECRET = `${process.env.SESSION_SECRET}`;
 
 const app = express();
@@ -61,8 +61,8 @@ app.use(routes);
 
 const server = http.createServer(app);
 
-server.listen(PORT, () => {
-    console.log("Server running on 3000");
+server.listen(PORT, "127.0.0.1", () => {
+    console.log(`Server running on ${PORT}`);
 });
 
 function Shutdown() {

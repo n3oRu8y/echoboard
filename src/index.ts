@@ -8,6 +8,8 @@ import path from "path";
 import expressLayouts from "express-ejs-layouts";
 import routes from "./routes/index.js";
 import AuthMiddleware from "./middlewares/AuthMiddleware.js";
+import PageNotFound from "./middlewares/PageNotFound.js";
+import PageError from "./middlewares/PageError.js";
 
 const PORT = Number(process.env.PORT) || 3000;
 const SESSION_SECRET = `${process.env.SESSION_SECRET}`;
@@ -58,6 +60,9 @@ app.use((req, res, next) => {
 });
 
 app.use(routes);
+
+app.use(PageNotFound);
+app.use(PageError);
 
 const server = http.createServer(app);
 

@@ -10,6 +10,8 @@ import routes from "./routes/index.js";
 import AuthMiddleware from "./middlewares/AuthMiddleware.js";
 import PageNotFound from "./middlewares/PageNotFound.js";
 import PageError from "./middlewares/PageError.js";
+import ViewService from "./application/view/ViewService.js";
+import { SetupMiddleware } from "./middlewares/SetupMiddleware.js";
 
 const PORT = Number(process.env.PORT) || 3000;
 const SESSION_SECRET = `${process.env.SESSION_SECRET}`;
@@ -51,11 +53,15 @@ app.use(express.urlencoded({
 
 app.use(cookieParser());
 
+app.use(SetupMiddleware);
+
 app.use(AuthMiddleware);
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
     res.locals.title = "오류";
     res.locals.user = req.session?.user;
+    res.locals.navbarBoards = await ViewService.GetNavbarBoards();
+
     next();
 });
 

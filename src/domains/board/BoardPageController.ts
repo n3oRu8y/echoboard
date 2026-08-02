@@ -15,7 +15,7 @@ export default class BoardPageController {
         return res.render("board/boards.ejs", {
             boards: boards,
             format: FormatDatetime,
-            title: "게시판 목록"
+            title: "홈"
         });
     }
 

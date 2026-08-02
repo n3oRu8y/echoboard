@@ -1,0 +1,91 @@
+<div class="container mt-5">
+    <h2 class="mb-4">관리자 대시보드</h2>
+
+    <div class="row g-4">
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">전체 회원</h6>
+                    <h2 class="mb-0"><%= stats.userCount %>명</h2>
+                </div>
+
+                <div class="card-footer bg-white">
+                    <a href="/admin/users" class="text-decoration-none">
+                        유저 관리 →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">전체 게시글</h6>
+                    <h2 class="mb-0"><%= stats.postCount %>개</h2>
+                </div>
+
+                <div class="card-footer bg-white">
+                    <a href="/admin/posts" class="text-decoration-none">
+                        게시글 관리 →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">전체 댓글</h6>
+                    <h2 class="mb-0"><%= stats.commentCount %>개</h2>
+                </div>
+
+                <div class="card-footer bg-white">
+                    <a href="/admin/comments" class="text-decoration-none">
+                        댓글 관리 →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">게시판</h6>
+                    <h2 class="mb-0"><%= stats.boardCount %>개</h2>
+                </div>
+
+                <div class="card-footer bg-white">
+                    <a href="/admin/boards" class="text-decoration-none">
+                        게시판 관리 →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mt-5">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">빠른 관리</h5>
+        </div>
+
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-2">
+                <a href="/admin/users" class="btn btn-outline-primary">
+                    유저 관리
+                </a>
+
+                <a href="/admin/boards" class="btn btn-outline-primary">
+                    게시판 관리
+                </a>
+
+                <a href="/admin/posts" class="btn btn-outline-primary">
+                    게시글 관리
+                </a>
+
+                <a href="/admin/comments" class="btn btn-outline-primary">
+                    댓글 관리
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

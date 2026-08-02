@@ -4,12 +4,18 @@ import Board from "./BoardDomain.js";
 import { ConflictError } from "../../common/exceptions/ConflictError.js";
 
 export default class BoardRepo {
-    public async Create(board: Board) {
+    public async Create(board: Board): Promise<Board> {
         try {
             const saved = await prisma.board.create({
                 data: {
                     url: board.url,
                     name: board.name,
+                    description: board.description,
+                    canRead: board.canRead,
+                    canWrite: board.canWrite,
+                    isPrivate: board.isPrivate,
+                    showHome: board.showHome,
+                    showNavbar: board.showNavbar,
                     createdBy: board.createdBy,
                     createdAt: board.createdAt
                 }
@@ -23,6 +29,7 @@ export default class BoardRepo {
                 }
                 throw e;
             }
+            throw e;
         }
     }
 
@@ -37,6 +44,8 @@ export default class BoardRepo {
                     canRead: board.canRead,
                     canWrite: board.canWrite,
                     isPrivate: board.isPrivate,
+                    showHome: board.showHome,
+                    showNavbar: board.showNavbar,
                     createdAt:  board.createdAt,
                     updatedAt: board.updatedAt,
                     deletedAt: board.deletedAt

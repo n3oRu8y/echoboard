@@ -7,8 +7,27 @@ export default class BoardService {
         private repo: BoardRepo
     ) {}
 
-    public async Create(url: string, name: string, createdBy: string, now: Date = new Date()) {
+    public async Create(
+        url: string,
+        name: string,
+        description: string,
+        createdBy: string,
+        canRead: boolean = true,
+        canWrite: boolean = true,
+        isPrivate: boolean = false,
+        showHome: boolean,
+        showNavbar: boolean,
+        now: Date = new Date()
+    ): Promise<Board> {
         const board = Board.Create(url, name, createdBy, now);
+
+        board.description = description;
+        board.canRead = canRead;
+        board.canWrite = canWrite;
+        board.isPrivate = isPrivate;
+        board.showHome = showHome;
+        board.showNavbar = showNavbar;
+
         return await this.repo.Create(board);
     }
 
@@ -70,17 +89,34 @@ export default class BoardService {
             throw new BoardNotFound(`Could not find a board with the id ${boardId}.`);
         }
 
-        if (canRead) {
+        if (canRead != undefined) {
             board.canRead = canRead;
         }
 
-        if (canWrite) {
+        if (canWrite != undefined) {
             board.canWrite = canWrite;
         }
 
-        if (isPrivate) {
+        if (isPrivate != undefined) {
             board.isPrivate = isPrivate;
         }
+
+        await this.repo.Update(boardId, board);
+    }
+
+    public async UpdateVisibility(boardId: number, showHome: boolean, showNavbar: boolean) {
+        const board = await this.repo.FindById(boardId);
+        if (!board) {
+            throw new BoardNotFound(`Could not find a board with the id ${boardId}.`);
+        }
+
+        if (showHome != undefined) {
+            board.showHome = showHome;
+        }
+
+        if (showNavbar != undefined) {
+            board.showNavbar = showNavbar;
+        } 
 
         await this.repo.Update(boardId, board);
     }

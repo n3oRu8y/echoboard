@@ -59,6 +59,9 @@ model Board {
   canWrite    Boolean   @default(true)
   isPrivate   Boolean   @default(false)
 
+  showHome    Boolean   @default(true)
+  showNavbar  Boolean   @default(true)
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?

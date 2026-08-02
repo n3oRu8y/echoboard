@@ -18,18 +18,24 @@ export default class BoardController {
             return res.status(403).json({ status: "error", message: "관리자만 게시판을 생성할 수 있습니다." });
         }
 
-        const { url, name, description } = req.body;
+        const { url, name, description, canWrite, canRead, isPrivate, showHome, showNavbar } = req.body;
         if (!url || !name) {
             return res.status(400).json({ status: "error", message: "필수 항목 누락" });
         }
 
         try {
             const boardService = new BoardService(new BoardRepo());
-            const board = await boardService.Create(url, name, user.id!);
-
-            if (description) {
-                await boardService.SetDescription(board!.id!, description);
-            }
+            await boardService.Create(
+                url,
+                name,
+                description,
+                user.id!,
+                canRead ?? true,
+                canWrite ?? true,
+                isPrivate ?? false,
+                showHome ?? true,
+                showNavbar ?? true
+            );
         } catch (e) {
             if (e instanceof ConflictError) {
                 return res.status(409).json({ status: "error", message: "게시판 주소가 중복됩니다." });
@@ -56,7 +62,7 @@ export default class BoardController {
             return res.status(404).json({ status: "error", message: "게시판을 찾을 수 없습니다." });
         }
 
-        const { url, name, description, canRead, canWrite, isPrivate } = req.body;
+        const { url, name, description, canRead, canWrite, isPrivate, showHome, showNavbar } = req.body;
 
         if (!url && !name && !description) {
             return res.status(400).json({ status: "error", message: "변경할 항목을 입력해주세요." });
@@ -84,6 +90,10 @@ export default class BoardController {
                 isPrivate !== undefined
             ) {
                 await boardService.ChangePermission(board.id!, canRead, canWrite, isPrivate);
+            }
+
+            if (showHome !== undefined || showNavbar != undefined) {
+                await boardService.UpdateVisibility(board.id!, showHome, showNavbar);
             }
         } catch (e) {
             if (e instanceof BoardNotFound) {

@@ -31,8 +31,8 @@ export default class BoardService {
         return await this.repo.Create(board);
     }
 
-    public async GetAll(withPost: boolean = false, withoutPrivateBoard: boolean = false) {
-        return await this.repo.FetchAll(withPost, withoutPrivateBoard);
+    public async GetAll(withPost: boolean = false, withoutPrivateBoard: boolean = false, ignoreHomeVisibility: boolean = true) {
+        return await this.repo.FetchAll(withPost, withoutPrivateBoard, ignoreHomeVisibility);
     }
 
     public async GetById(id: number): Promise<Board>;

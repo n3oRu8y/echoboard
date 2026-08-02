@@ -11,7 +11,7 @@ import FormatDatetime from "../../common/utils/FormatDatetime.js";
 export default class BoardPageController {
     public static async RenderBoardList(req: Request, res: Response) {
         const boardService = new BoardService(new BoardRepo());
-        const boards = await boardService.GetAll(true);
+        const boards = await boardService.GetAll(true, true, false);
         return res.render("board/boards.ejs", {
             boards: boards,
             format: FormatDatetime,

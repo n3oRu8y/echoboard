@@ -20,6 +20,17 @@
                 "${workspaceFolder}/**/*.js"
             ],
             "envFile": "${workspaceFolder}/.env"
-        }
+        },
+        {
+            "name": "컴파일 후 시작",
+            "program": "${workspaceFolder}/dist/index.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node",
+            "envFile": "${workspaceFolder}/.env",
+            "preLaunchTask": "tsc: 빌드 - tsconfig.json"
+        },
     ]
 }

@@ -17,6 +17,9 @@
             <div class="navbar-nav">
                 <% if (user) { %>
                     <a class="nav-link" href="/mypage"><%= user.username %> 님</a>
+                    <% if (user.role == "ADMIN") { %>
+                        <a class="nav-link" href="/admin">관리자 페이지</a>
+                    <% } %>
                     <button class="nav-link" id="logout-button">로그아웃</a>
                 <% } else { %>
                     <a class="nav-link" href="/login">로그인</a>

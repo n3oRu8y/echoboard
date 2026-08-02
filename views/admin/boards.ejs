@@ -1,0 +1,249 @@
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">게시판 관리</h3>
+            <button class="btn btn-primary btn-sm" id="create-board">게시판 추가</button>
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>이름</th>
+                        <th>URL</th>
+                        <th>네비바</th>
+                        <th>홈 표시</th>
+                        <th>읽기</th>
+                        <th>쓰기</th>
+                        <th>비밀게시판</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% boards.forEach(board => { %>
+                        <tr>
+                            <td>
+                                <%= board.name %>
+                            </td>
+
+                            <td>
+                                /<%= board.url %>
+                            </td>
+
+                            <td>
+                                <%= board.showNavbar ? "표시" : "숨김" %>
+                            </td>
+
+                            <td>
+                                <%= board.showHome ? "표시" : "숨김" %>
+                            </td>
+
+                            <td>
+                                <%= board.canRead ? "허용" : "차단" %>
+                            </td>
+
+                            <td>
+                                <%= board.canWrite ? "허용" : "차단" %>
+                            </td>
+
+                            <td>
+                                <%= board.isPrivate ? "예" : "아니오" %>
+                            </td>
+
+                            <td>
+                                <button
+                                    class="btn btn-outline-primary btn-sm"
+                                    onclick="EditBoard(<%= JSON.stringify(board) %>)">
+                                    수정
+                                </button>
+                                <button class="btn btn-danger btn-sm" id="board-delete" data-board-id="<%= board.id %>">삭제</button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="boardModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="board-form">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        게시판 설정
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" name="boardId">
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            이름
+                        </label>
+                        <input class="form-control" name="name">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            URL
+                        </label>
+                        <input class="form-control" name="url">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            설명
+                        </label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="canRead" checked>
+                        <label class="form-check-label">
+                            읽기 허용
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="canWrite" checked>
+                        <label class="form-check-label">
+                            쓰기 허용
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="isPrivate">
+                        <label class="form-check-label">
+                            비밀게시판
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="showNavbar" checked>
+                        <label class="form-check-label">
+                            네비바 표시
+                        </label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="showHome" checked>
+                        <label class="form-check-label">
+                            홈페이지 표시
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        취소
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        저장
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function EditBoard(board) {
+    const form = document.getElementById("board-form");
+
+    form.elements.boardId.value = board.id ?? "";
+    form.elements.name.value = board.name ?? "";
+    form.elements.url.value = board.url ?? "";
+    form.elements.description.value = board.description ?? "";
+
+    form.elements.showNavbar.checked = board.showNavbar;
+    form.elements.showHome.checked = board.showHome;
+    form.elements.canRead.checked = board.canRead;
+    form.elements.canWrite.checked = board.canWrite;
+    form.elements.isPrivate.checked = board.isPrivate;
+
+    const modal = new bootstrap.Modal(
+        document.getElementById("boardModal")
+    );
+
+    modal.show();
+}
+
+const createButton = document.getElementById("create-board").addEventListener("click", e => {
+    const form = document.getElementById("board-form");
+
+    form.elements.boardId.value = ""
+    form.elements.name.value = ""
+    form.elements.url.value = ""
+    form.elements.description.value = ""
+
+    form.elements.showNavbar.checked = true;
+    form.elements.showHome.checked = true;
+    form.elements.canRead.checked = true;
+    form.elements.canWrite.checked = true;
+    form.elements.isPrivate.checked = false;
+
+    const modal = new bootstrap.Modal(
+        document.getElementById("boardModal")
+    );
+    
+    modal.show();
+});
+
+const boardForm = document.getElementById("board-form");
+
+boardForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    const formData = new FormData(boardForm);
+
+    const body = {
+        name: formData.get("name")?.toString().trim(),
+        url: formData.get("url")?.toString().trim(),
+        description: formData.get("description")?.toString().trim(),
+        showNavbar: formData.has("showNavbar"),
+        showHome: formData.has("showHome"),
+        canRead: formData.has("canRead"),
+        canWrite: formData.has("canWrite"),
+        isPrivate: formData.has("isPrivate"),
+    };
+
+    const id = formData.get("boardId");
+
+    const res = await fetch(id ? `/api/boards/${id}` : "/api/boards", {
+        method: id ? "PATCH" : "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+        const data = await res.json();
+        return alert(data.message);
+    }
+
+    location.reload();
+});
+
+document.querySelectorAll("#board-delete").forEach(btn => {
+    btn.addEventListener("click", async e => {
+        if (!confirm("게시판을 삭제하시겠습니까?")) return;
+
+        const boardId = btn.dataset.boardId;
+        const res = await fetch(`/api/boards/${boardId}`, { method: "DELETE" });
+
+        const data = await res.json();
+
+        if (!res.ok)
+            return alert(data.message);
+
+        alert("게시판이 삭제되었습니다.");
+        return location.reload();
+    });
+});
+</script>

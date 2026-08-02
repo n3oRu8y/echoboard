@@ -7,5 +7,6 @@ const router = express.Router();
 router.use(AdminCheck);
 
 router.get("/", AdminPageController.AdminHomePage);
+router.get("/boards", AdminPageController.SetBoardPage);
 
 export default router;

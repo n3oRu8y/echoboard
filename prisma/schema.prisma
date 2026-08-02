@@ -87,6 +87,9 @@ model Post {
   deletedAt DateTime?
 
   comments Comment[]
+
+  @@index([authorId, deletedAt])
+  @@index([boardId, deletedAt, createdAt])
 }
 
 model Attachment {

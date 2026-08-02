@@ -1,37 +1,5 @@
 import ValidationException from "../../common/exceptions/ValidationException.js";
 
-class PostSummery {
-    constructor(
-        public id: number,
-        public title: string,
-        public isAnonymous: boolean,
-        public createdAt: Date
-    ) {}
-
-    public static FromRow(row: any) {
-        return new PostSummery(
-            row.id,
-            row.title,
-            row.isAnonymous,
-            row.createdAt
-        );
-    }
-}
-
-class CommentSummery {
-    constructor(
-        public id: number,
-        public content: string,
-        public cretedAt: Date
-    ) {}
-
-    public static FromRow(row: any) {
-        row.id,
-        row.content,
-        row.createdAt
-    }
-}
-
 export default class User {
     constructor(
         public id: string | null,
@@ -54,8 +22,8 @@ export default class User {
         public updatedAt: Date | null,
         public deletedAt: Date | null,
 
-        public posts: Array<PostSummery>,
-        public comments: Array<CommentSummery>
+        public postCount: number,
+        public commentCount: number
     ) {}
 
     static Create(username: string, password: string, email: string) {
@@ -74,8 +42,8 @@ export default class User {
             new Date(),
             null,
             null,
-            [],
-            []
+            0,
+            0
         );
     }
 
@@ -95,8 +63,8 @@ export default class User {
             row.createdAt,
             row.updatedAt,
             row.deletedAt,
-            row.posts ? row.posts.map((post: any) => PostSummery.FromRow(post)) : [],
-            row.comments ? row.comments.map((comment: any) => CommentSummery.FromRow(comment)) : []
+            row._count?.posts ?? 0,
+            row._count?.comments ?? 0
         )
     }
 

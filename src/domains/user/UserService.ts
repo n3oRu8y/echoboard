@@ -48,8 +48,8 @@ export default class UserService {
     public async GetUserWithUserId(userId: string, silent: false, withFk?: boolean): Promise<User>
     public async GetUserWithUserId(userId: string, silent: true, withFk?: boolean): Promise<User | null>
 
-    public async GetUserWithUserId(userId: string, silent: boolean = false, withFk: boolean = false) {
-        const user = await this.repo.FindByUserId(userId, withFk);
+    public async GetUserWithUserId(userId: string, silent: boolean = false, withCount: boolean = false) {
+        const user = await this.repo.FindByUserId(userId, withCount);
         if (!user && !silent) {
             throw new UserNotFound(`Could not find a user with the id ${userId}.`);
         }

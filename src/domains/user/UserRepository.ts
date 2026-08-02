@@ -76,22 +76,26 @@ export default class UserRepo {
         return row ? User.FromRow(row) : null;
     }
 
-    async FindByUserId(userId: string, withFk: boolean = false): Promise<User | null> {
+    async FindByUserId(userId: string, withCount: boolean = false): Promise<User | null> {
         const row = await prisma.user.findFirst({
             where: {
                 id: userId,
                 deletedAt: null
             }, 
-            ...(withFk && {
+            ...(withCount && {
                 include: {
-                    posts: {
-                        where: {
-                            deletedAt: null
-                        }
-                    },
-                    comments: {
-                        where: {
-                            deletedAt: null
+                    _count: {
+                        select: {
+                            posts: {
+                                where: {
+                                    deletedAt: null
+                                }
+                            },
+                            comments: {
+                                where: {
+                                    deletedAt: null
+                                }
+                            }
                         }
                     }
                 }

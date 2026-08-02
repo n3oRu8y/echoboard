@@ -1,0 +1,89 @@
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-white">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">내가 작성한 글</h3>
+
+                <div class="d-flex gap-2">
+                    <form method="get" class="d-flex flex-shrink-0">
+                        <input
+                            type="text"
+                            name="query"
+                            class="form-control form-control-sm"
+                            placeholder="검색"
+                            value="<%= query ?? '' %>">
+
+                        <button type="submit" class="btn btn-primary btn-sm ms-1 text-nowrap">
+                            검색
+                        </button>
+                    </form>
+
+                    <a href="/mypage" class="btn btn-outline-secondary btn-sm text-nowrap">
+                        마이페이지
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <% if (posts.length === 0) { %>
+                <div class="text-center text-muted py-5">
+                    작성한 게시글이 없습니다.
+                </div>
+            <% } else { %>
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 80px;">번호</th>
+                            <th>제목</th>
+                            <th style="width: 120px;">게시판</th>
+                            <th style="width: 140px;">작성일</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% posts.forEach(post => { %>
+                            <tr>
+                                <td><%= post.id %></td>
+
+                                <td>
+                                    <a
+                                        href="/boards/<%= post.board.url %>/<%= post.id %>"
+                                        class="text-decoration-none text-dark">
+                                        <%= post.title %>
+                                    </a>
+                                </td>
+
+                                <td>
+                                    <%= post.board.name %>
+                                </td>
+
+                                <td>
+                                    <%= Format(post.createdAt) %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </div>
+
+        <% if (totalPages > 1) { %>
+            <div class="card-footer bg-white">
+                <nav>
+                    <ul class="pagination justify-content-center mb-0">
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= i === page ? 'active' : '' %>">
+                                <a
+                                    class="page-link"
+                                    href="?page=<%= i %>&query=<%= encodeURIComponent(query ?? '') %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                        <% } %>
+                    </ul>
+                </nav>
+            </div>
+        <% } %>
+    </div>
+</div>

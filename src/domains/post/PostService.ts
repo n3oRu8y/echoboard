@@ -79,7 +79,7 @@ export default class PostService {
         return post;
     }
 
-    public async GetPostFromBoard(boardId: number, page: number = 1, query: string | null = null) {
+    public async GetBoardPosts(boardId: number, page: number = 1, query: string | null = null) {
         if (page < 1) {
             throw new ValidationException("Invalid page");
         }
@@ -87,7 +87,22 @@ export default class PostService {
         return await this.postRepo.FindByBoardId(boardId, 10, (page - 1) * 10, query);
     }
 
-    public async GetPostCount(boardId: number) {
-        return await this.postRepo.FetchPostCount(boardId);
+    public async GetBoardPostCount(boardId: number) {
+        return await this.postRepo.FetchBoardPostCount(boardId);
+    }
+
+    public async GetUserPosts(userId: string, page: number = 1, query: string | null = null) {
+        if (page < 1) {
+            throw new ValidationException("Invalid page");
+        }
+
+        const limit = 10;
+        const offset = 10 * (page - 1);
+
+        return await this.postRepo.FindByUserId(userId, limit, offset, query);
+    }
+
+    public async GetUserPostCount(userId: string, query: string | null) {
+        return await this.postRepo.FetchUserPostCount(userId, query);
     }
 }

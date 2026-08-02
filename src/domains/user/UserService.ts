@@ -45,8 +45,8 @@ export default class UserService {
     }
 
     public async GetUserWithUserId(userId: string): Promise<User>
-    public async GetUserWithUserId(userId: string, silent: false, withFk?: boolean): Promise<User>
-    public async GetUserWithUserId(userId: string, silent: true, withFk?: boolean): Promise<User | null>
+    public async GetUserWithUserId(userId: string, silent: false, withCount?: boolean): Promise<User>
+    public async GetUserWithUserId(userId: string, silent: true, withCount?: boolean): Promise<User | null>
 
     public async GetUserWithUserId(userId: string, silent: boolean = false, withCount: boolean = false) {
         const user = await this.repo.FindByUserId(userId, withCount);

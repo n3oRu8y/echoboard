@@ -42,8 +42,8 @@ export default class BoardPageController {
         const query = req.query.query as string;
 
         const postService = new PostService(new PostRepository(), new AttachmentRepository());
-        const posts = await postService.GetPostFromBoard(board.id!, page, query);
-        const totalPosts = await postService.GetPostCount(board.id!);
+        const posts = await postService.GetBoardPosts(board.id!, page, query);
+        const totalPosts = await postService.GetBoardPostCount(board.id!);
         const totalPages = Math.max(1, Math.ceil(totalPosts / 10));
         
         return res.render("board/board.ejs", {

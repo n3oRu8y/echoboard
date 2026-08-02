@@ -87,7 +87,7 @@ export default class PostRepository {
         return result;
     }
 
-    public async FetchPostCount(boardId: number) {
+    public async FetchBoardPostCount(boardId: number) {
         const result = await prisma.post.count({
             where: {
                 deletedAt: null,
@@ -95,6 +95,71 @@ export default class PostRepository {
             }
         });
 
+        return result;
+    }
+
+    public async FindByUserId(userId: string, limit: number, offset: number, query: string | null) {
+        const rows = await prisma.post.findMany({
+            take: limit,
+            skip: offset,
+            where: {
+                deletedAt: null,
+                authorId: userId,
+                ...(query && {
+                    OR: [
+                            {
+                                content: {
+                                    contains: query
+                                },
+                            },
+                            {
+                                    title: {
+                                    contains: query
+                                }
+                            }
+                    ]
+                }),
+                board: {
+                    deletedAt: null,
+                }
+            },
+            include: {
+                board: true
+            },
+            orderBy: {
+                id: "desc"
+            }
+        });
+        
+        const result: Array<Post> = [];
+        for(const row of rows) {
+            result.push(Post.FromRow(row));
+        }
+
+        return result;
+    }
+
+    public async FetchUserPostCount(userId: string, query: string | null) {
+        const result = await prisma.post.count({
+            where: {
+                deletedAt: null,
+                authorId: userId,
+                ...(query && {
+                    OR: [
+                            {
+                                content: {
+                                    contains: query
+                                },
+                            },
+                            {
+                                    title: {
+                                    contains: query
+                                }
+                            }
+                    ]
+                })
+            },
+        });
         return result;
     }
 

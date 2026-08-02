@@ -4,6 +4,10 @@ import UserService from "./UserService.js";
 import dayjs from "dayjs";
 import TOTPService from "../../application/auth/TOTPService.js";
 import QRCode from "qrcode";
+import PostRepository from "../post/PostRepositorty.js";
+import PostService from "../post/PostService.js";
+import AttachmentRepository from "../attachment/AttachmentRepository.js";
+import FormatDatetime from "../../common/utils/FormatDatetime.js";
 
 export default class UserPageController {
     private constructor() {};
@@ -13,8 +17,12 @@ export default class UserPageController {
     }
 
     private static userRepo = new UserRepo();
-    private static userService = new UserService(this.userRepo);
-    private static totpService = new TOTPService(this.userRepo);
+    private static userService = new UserService(UserPageController.userRepo);
+    private static totpService = new TOTPService(UserPageController.userRepo);
+
+    private static postRepo = new PostRepository();
+    private static attachmentRepo = new AttachmentRepository();
+    private static postService = new PostService(UserPageController.postRepo, UserPageController.attachmentRepo);
 
     public static async MyPage(req: Request, res: Response) {
         if (!req.session?.userId) {
@@ -80,5 +88,33 @@ export default class UserPageController {
         }
 
         return res.render("user/withdraw.ejs", { title: "회원탈퇴" });
+    }
+
+    public static async GetMyPosts(req: Request, res: Response) {
+        if (!req.session?.userId) {
+            return res.redirect("/login");
+        }
+
+        const query = req.query.query as string;
+        let page = Number(req.query.page ?? 1);
+        if (!Number.isInteger(page) || page <= 1) {
+            page = 1;
+        }
+
+        const user = await UserPageController.userService.GetUserWithUserId(req.session.userId);
+        const posts = await UserPageController.postService.GetUserPosts(req.session.userId, page, query);
+        const postCount = await UserPageController.postService.GetUserPostCount(user.id!, query);
+
+        const totalPages = postCount / 10 + 1;
+
+        return res.render("user/posts.ejs", {
+            title: "작성 글 목록",
+            user: user,
+            posts: posts,
+            totalPages: totalPages,
+            page: page,
+            query: query,
+            Format: FormatDatetime
+        })
     }
 };

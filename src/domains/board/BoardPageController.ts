@@ -43,7 +43,7 @@ export default class BoardPageController {
 
         const postService = new PostService(new PostRepository(), new AttachmentRepository());
         const posts = await postService.GetBoardPosts(board.id!, page, query);
-        const totalPosts = await postService.GetBoardPostCount(board.id!);
+        const totalPosts = await postService.GetBoardPostCount(board.id!, query);
         const totalPages = Math.max(1, Math.ceil(totalPosts / 10));
         
         return res.render("board/board.ejs", {

@@ -87,11 +87,25 @@ export default class PostRepository {
         return result;
     }
 
-    public async FetchBoardPostCount(boardId: number) {
+    public async FetchBoardPostCount(boardId: number, query: string | null) {
         const result = await prisma.post.count({
             where: {
                 deletedAt: null,
-                boardId: boardId
+                boardId: boardId,
+                ...(query && {
+                    OR: [
+                            {
+                                content: {
+                                    contains: query
+                                },
+                            },
+                            {
+                                    title: {
+                                    contains: query
+                                }
+                            }
+                    ]
+                })
             }
         });
 

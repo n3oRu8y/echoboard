@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import UserRepo from "./UserRepository.js";
 import UserService from "./UserService.js";
 import dayjs from "dayjs";
-import TOTPService from "../../application/auth/TOTPService.js";
+import TOTPService from "../../application/totp/TOTPService.js";
 import QRCode from "qrcode";
 import PostRepository from "../post/PostRepositorty.js";
 import PostService from "../post/PostService.js";

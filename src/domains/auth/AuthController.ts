@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import UserService from "../user/UserService.js";
 import UserRepo from "../user/UserRepository.js";
 import { ConflictError } from "../../common/exceptions/ConflictError.js";
-import TOTPService from "../../application/auth/TOTPService.js";
+import TOTPService from "../../application/totp/TOTPService.js";
 import CredentialFailed from "../../common/exceptions/CredentialFailed.js";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;

@@ -3,6 +3,10 @@ import { generateSecret, generateURI, verify } from "otplib";
 import type UserRepo from "../../domains/user/UserRepository.js";
 import UserNotFound from "../../domains/user/exceptions/UserNotFound.js";
 import CredentialFailed from "../../common/exceptions/CredentialFailed.js";
+import type { PrismaClient } from "../../generated/prisma/client.js";
+import type { TransactionClient } from "../../generated/prisma/internal/prismaNamespace.js";
+import prisma from "../../db/prisma.js";
+import TwoFactorNotEnabled from "./exceptions/TwoFactorNotEnabled.js";
 
 export class TOTPResult {
     public secret: string;
@@ -65,20 +69,35 @@ export default class TOTPService {
         await this.userRepo.Update(userId, user);
     }
 
-    public async Disable(userId: string, token: string) {
+    public async Disable(userId: string, token: string | null, isAdminAction: boolean = false, db: PrismaClient | TransactionClient = prisma) {
         const user = await this.userRepo.FindByUserId(userId);
         if (!user) {
             throw new UserNotFound(`User with ${userId} is not found`);
         }
 
-        const verified = await this.Verify(userId, token);
-        if (!verified) {
-            throw new CredentialFailed("Credential failed");
+        if (!user.twoFactorEnabled) {
+            throw new TwoFactorNotEnabled();
+        }
+
+        if (!isAdminAction) {
+            if (!token) {
+                throw new CredentialFailed("Credential failed");
+            }
+
+            if (!/^\d{6}$/.test(token)) {
+                throw new CredentialFailed("Credential failed");
+            }
+
+            const verified = await this.Verify(userId, token);
+
+            if (!verified) {
+                throw new CredentialFailed("Credential failed");
+            }
         }
 
         user.twoFactorEnabled = false;
         user.twoFactorSecret = null;
 
-        await this.userRepo.Update(userId, user);
+        await this.userRepo.Update(userId, user, db);
     }
 };

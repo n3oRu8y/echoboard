@@ -3,6 +3,10 @@ import type UserRepo from "./UserRepository.js";
 import UserNotFound from "./exceptions/UserNotFound.js";
 import CredentialFailed from "../../common/exceptions/CredentialFailed.js";
 import User from "./UserDomain.js";
+import type { PrismaClient } from "../../generated/prisma/client.js";
+import type { TransactionClient } from "../../generated/prisma/internal/prismaNamespace.js";
+import prisma from "../../db/prisma.js";
+import { InvalidRole } from "./exceptions/InvalidRole.js";
 
 export default class UserService {
     constructor(private readonly repo: UserRepo) {}
@@ -73,18 +77,18 @@ export default class UserService {
         await this.repo.Update(userId, user);
     }
 
-    public async ChangeNickname(userId: string, nickname: string) {
-        const user = await this.repo.FindByUserId(userId);
+    public async ChangeNickname(userId: string, nickname: string, db: PrismaClient | TransactionClient = prisma) {
+        const user = await this.repo.FindByUserId(userId, false, db);
         if (!user) {
             throw new UserNotFound(`User with ${userId} is not found`);
         }
 
         user.SetNickname(nickname);
-        await this.repo.Update(userId, user);
+        await this.repo.Update(userId, user, db);
     }
 
-    public async ChangePassword(userId: string, newPassword: string, oldPassword: string | null, skipVerfiy: boolean = false) {
-        const user = await this.repo.FindByUserId(userId);
+    public async ChangePassword(userId: string, newPassword: string, oldPassword: string | null, skipVerfiy: boolean = false, db: PrismaClient | TransactionClient = prisma) {
+        const user = await this.repo.FindByUserId(userId, false, db);
         if (!user) {
             throw new UserNotFound(`User with ${userId} is not found`);
         }
@@ -101,6 +105,39 @@ export default class UserService {
         }
 
         user.password = await argon2.hash(newPassword);
-        await this.repo.Update(userId, user);
+        await this.repo.Update(userId, user, db);
+    }
+
+    public async ChangeEmail(userId: string, email: string, db: PrismaClient | TransactionClient = prisma) {
+        const user = await this.repo.FindByUserId(userId, false, db);
+        if (!user) {
+            throw new UserNotFound(`User with ${userId} is not found`);
+        }
+
+        user.email = email;
+        await this.repo.Update(userId, user, db);
+    }
+
+    public async Ban(userId: string, bannedUntil: Date, reason: string, db: PrismaClient | TransactionClient = prisma) {
+        const user = await this.repo.FindByUserId(userId, false, db);
+        if (!user) {
+            throw new UserNotFound(`User with ${userId} is not found`);
+        }
+
+        user.Ban(bannedUntil, reason);
+        await this.repo.Update(userId, user, db);
+    }
+
+    public async ChangeRole(userId: string, role: string, db: PrismaClient | TransactionClient = prisma) {
+        if (role != "USER" && role != "ADMIN")
+            throw new InvalidRole();
+
+        const user = await this.repo.FindByUserId(userId, false, db);
+        if (!user) {
+            throw new UserNotFound(`User with ${userId} is not found`);
+        }
+
+        user.role = role;
+        await this.repo.Update(userId, user, db);
     }
 }

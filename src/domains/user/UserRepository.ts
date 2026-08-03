@@ -3,6 +3,8 @@ import User from "./UserDomain.js";
 import { Role } from "../../generated/prisma/enums.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { ConflictError } from "../../common/exceptions/ConflictError.js";
+import type { PrismaClient } from "../../generated/prisma/client.js";
+import type { TransactionClient } from "../../generated/prisma/internal/prismaNamespace.js";
 
 export default class UserRepo {
     private ToPrismaRole(role: string) {
@@ -36,9 +38,9 @@ export default class UserRepo {
         }
     }
 
-    async Update(userId: string, user: User) {
+    async Update(userId: string, user: User, db: PrismaClient | TransactionClient = prisma) {
         try {
-            await prisma.user.update({
+            await db.user.update({
                 where: {
                     id: userId
                 },
@@ -76,8 +78,8 @@ export default class UserRepo {
         return row ? User.FromRow(row) : null;
     }
 
-    async FindByUserId(userId: string, withCount: boolean = false): Promise<User | null> {
-        const row = await prisma.user.findFirst({
+    async FindByUserId(userId: string, withCount: boolean = false, db: PrismaClient | TransactionClient = prisma): Promise<User | null> {
+        const row = await db.user.findFirst({
             where: {
                 id: userId,
                 deletedAt: null

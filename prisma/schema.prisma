@@ -115,7 +115,7 @@ model Attachment {
 }
 
 model PostReaction {
-  id        String   @id @default(cuid())
+  id        Int   @id @default(autoincrement())
 
   userId    String
   postId    Int

@@ -1,0 +1,107 @@
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">유저 관리</h3>
+
+            <form class="d-flex gap-2" method="GET">
+                <input
+                    class="form-control form-control-sm"
+                    type="text"
+                    name="query"
+                    placeholder="아이디 또는 닉네임"
+                    value="<%= query ?? "" %>">
+
+                <button class="btn btn-primary btn-sm ms-1 text-nowrap">
+                    검색
+                </button>
+            </form>
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>아이디</th>
+                        <th>닉네임</th>
+                        <th style="width: 120px;">권한</th>
+                        <th style="width: 120px;">상태</th>
+                        <th style="width: 170px;">가입일</th>
+                        <th style="width: 90px;"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% if (users.length === 0) { %>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-5">
+                                조회된 유저가 없습니다.
+                            </td>
+                        </tr>
+                    <% } %>
+
+                    <% users.forEach(user => { %>
+                        <tr>
+                            <td><%= user.username %></td>
+                            <td><%= user.nickname ?? "-" %></td>
+
+                            <td>
+                                <% if (user.role === "ADMIN") { %>
+                                    <span class="badge bg-danger">ADMIN</span>
+                                <% } else { %>
+                                    <span class="badge bg-secondary">USER</span>
+                                <% } %>
+                            </td>
+
+                            <td>
+                                <% if (user.deletedAt) { %>
+                                    <span class="badge bg-dark">탈퇴</span>
+                                <% } else if (user.bannedUntil && user.bannedUntil > new Date()) { %>
+                                    <span class="badge bg-warning text-dark">정지</span>
+                                <% } else { %>
+                                    <span class="badge bg-success">정상</span>
+                                <% } %>
+                            </td>
+
+                            <td><%= Format(user.createdAt) %></td>
+
+                            <td class="text-end">
+                                <button
+                                    class="btn btn-outline-primary btn-sm"
+                                    onclick="EditUser('<%= user.id %>')">
+                                    관리
+                                </button>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <% if (totalPages > 1) { %>
+            <div class="card-footer bg-white">
+                <nav>
+                    <ul class="pagination justify-content-center mb-0">
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= page === i ? "active" : "" %>">
+                                <a
+                                    class="page-link"
+                                    href="?page=<%= i %><%= query ? `&query=${encodeURIComponent(query)}` : "" %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                        <% } %>
+                    </ul>
+                </nav>
+            </div>
+        <% } %>
+    </div>
+</div>
+<script>
+function EditUser(userId) {
+    window.open(
+        `/admin/users/${userId}`,
+        "userManage",
+        "width=700,height=800,resizable=yes,scrollbars=yes"
+    );
+}
+</script>

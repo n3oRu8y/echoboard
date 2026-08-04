@@ -8,5 +8,7 @@ router.use(AdminCheck);
 
 router.get("/", AdminPageController.AdminHomePage);
 router.get("/boards", AdminPageController.SetBoardPage);
+router.get("/users", AdminPageController.UserListPage);
+router.get("/users/:userId", AdminPageController.UserDetailPage);
 
 export default router;

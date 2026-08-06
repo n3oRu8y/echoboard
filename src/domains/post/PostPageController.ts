@@ -4,7 +4,7 @@ import BoardRepo from "../board/BoardRepository.js";
 import UserService from "../user/UserService.js";
 import UserRepo from "../user/UserRepository.js";
 import dayjs from "dayjs";
-import PostService from "./PostService.js";
+import PostService, { safe } from "./PostService.js";
 import PostRepository from "./PostRepositorty.js";
 import AttachmentRepository from "../attachment/AttachmentRepository.js";
 import FormatDatetime from "../../common/utils/FormatDatetime.js";
@@ -160,6 +160,8 @@ export default class PostPageController {
                 reply.displayNick = PostPageController.getDisplayAuthor(reply.author!, reply.isAnonymous, post, authorMap);
             }
         }
+
+        post.content = safe(post.content); // XSS 필터링
 
         return res.render("post/post.ejs", {
             post: post,

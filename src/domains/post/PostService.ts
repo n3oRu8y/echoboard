@@ -8,7 +8,7 @@ import Post from "./PostDomain.js";
 import type PostRepository from "./PostRepositorty.js";
 import type User from "../user/UserDomain.js";
 
-const safe = (content: string) => sanitize(content, {
+export const safe = (content: string) => sanitize(content, {
     allowedTags: sanitize.defaults.allowedTags.concat(["img"]),
     allowedAttributes: {
         ...sanitize.defaults.allowedAttributes,

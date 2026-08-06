@@ -24,7 +24,7 @@ let turnstileWidgetId = null;
 
 function InitTurnstile() {
     try {
-        turnstileWidgetId = turnstile.render("#turnstileSpinner", {
+        turnstileWidgetId = turnstile.render("#turnstileContainer", {
             sitekey: sitekey,
             execution: "execute",
 

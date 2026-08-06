@@ -149,7 +149,7 @@ export default class PostPageController {
             return res.status(404).render("errors/404.ejs");
 
         const postSeervice = new PostService(new PostRepository(), new AttachmentRepository());
-        const post = await postSeervice.GetPost(postId, true);
+        const post = await postSeervice.GetPost(postId, true, true);
         if (!post)
             return res.status(404).render("errors/404.ejs");
 

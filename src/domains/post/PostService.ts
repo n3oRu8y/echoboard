@@ -7,6 +7,7 @@ import PostNotFound from "./exceptions/PostNotFound.js";
 import Post from "./PostDomain.js";
 import type PostRepository from "./PostRepositorty.js";
 import type User from "../user/UserDomain.js";
+import TurnstileService from "../../infrastructures/turnstile/TurnstileService.js";
 
 export const safe = (content: string) =>
     sanitize(content, {
@@ -38,7 +39,8 @@ export default class PostService {
         this.AttachmentRepo = attachmentRepo;
     }
 
-    public async CreatePost(authorId: string, title: string, content: string, isAnonymous: boolean, boardId: number, imageIds: Array<string>, attachmentIds: Array<string>, now: Date = new Date()) {
+    public async CreatePost(authorId: string, title: string, content: string, isAnonymous: boolean, boardId: number, imageIds: Array<string>, attachmentIds: Array<string>, token: string, ip: string, now: Date = new Date()) {
+        await TurnstileService.Verify(token, ip);
         const safeContent = safe(content);
         //const safeContent = content; // xss 필터링 끄고 테스트
         const post = Post.Create(title, safeContent, isAnonymous, authorId, boardId, now);
@@ -50,7 +52,8 @@ export default class PostService {
         });
     }
 
-    public async UpdatePost(postId: number, authorId: string, title: string, content: string, attachmentIds: Array<string>) {
+    public async UpdatePost(postId: number, authorId: string, title: string, content: string, attachmentIds: Array<string>, token: string, ip: string) {
+        await TurnstileService.Verify(token, ip);
         await prisma.$transaction(async tx => {
             const post = await this.postRepo.FindById(postId);
             if (!post) {

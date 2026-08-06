@@ -1,0 +1,19 @@
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+
+<div class="modal fade" id="turnstileSpinner" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 bg-transparent">
+            <div class="modal-body text-center text-white">
+                <div class="spinner-border mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div>보안 검증 중...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sitekey = "<%= sitekey %>";
+</script>
+<script src="/public/js/turnstile.js"></script>

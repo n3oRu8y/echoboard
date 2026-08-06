@@ -1,3 +1,4 @@
+import TurnstileService from "../../infrastructures/turnstile/TurnstileService.js";
 import Attachment from "./AttachmentDomain.js";
 import type AttachmentRepository from "./AttachmentRepository.js";
 
@@ -6,7 +7,8 @@ export default class AttachmentService {
         private repo: AttachmentRepository
     ) {}
 
-    public async Create(authorId: string, fileUrl: string, isImage: boolean, fileName: string, fileType: string, size: number, now: Date = new Date()) {
+    public async Create(authorId: string, fileUrl: string, isImage: boolean, fileName: string, fileType: string, size: number, token: string, ip: string, now: Date = new Date()) {
+        await TurnstileService.Verify(token, ip);
         const attachment = Attachment.Create(authorId, fileUrl, fileName, isImage, fileType, size, now);
         return await this.repo.Create(attachment);
     }

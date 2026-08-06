@@ -20,6 +20,11 @@ commentForm?.addEventListener("submit", async e => {
     e.preventDefault();
     const formData = new FormData(commentForm);
 
+    const token = await RenderTurnstile();
+    if (!token) {
+        return;
+    }
+
     try {
         const res = await fetch(`/api/boards/${boardUrl}/posts/${postId}/comments`, {
             method: "POST",
@@ -29,7 +34,8 @@ commentForm?.addEventListener("submit", async e => {
             body: JSON.stringify({
                 content: formData.get("content")?.toString().trim(),
                 parent: null,
-                isAnonymous: formData.has("anonymous")
+                isAnonymous: formData.has("anonymous"),
+                token: token,
             })
         });
 
@@ -105,6 +111,11 @@ replyForm.addEventListener("submit", async e => {
     e.preventDefault();
     const formData = new FormData(replyForm);
 
+    const token = await RenderTurnstile();
+    if (!token) {
+        return;
+    }
+
     try {
         const res = await fetch(`/api/boards/${boardUrl}/posts/${postId}/comments`, {
             method: "POST",
@@ -114,7 +125,8 @@ replyForm.addEventListener("submit", async e => {
             body: JSON.stringify({
                 content: formData.get("content")?.toString().trim(),
                 parentId: commentIdInput.value,
-                isAnonymous: formData.has("anonymous")
+                isAnonymous: formData.has("anonymous"),
+                token: token,
             })
         });
 

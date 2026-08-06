@@ -36,6 +36,7 @@
 
             <ul id="uploaded" class="list-group mb-4"></ul>
 
+            <div class="cf-turnstile" data-sitekey="<%= sitekey %>" data-action="subscribe"></div>
             <div class="d-grid">
                 <button
                     id="submit"
@@ -46,6 +47,8 @@
         </div>
     </div>
 </div>
+
+<%- include("../components/turnstile.ejs") %>
 
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script src="/public/js/write.js"></script>

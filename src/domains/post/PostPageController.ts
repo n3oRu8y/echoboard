@@ -11,6 +11,8 @@ import FormatDatetime from "../../common/utils/FormatDatetime.js";
 import type Post from "./PostDomain.js";
 import type User from "../user/UserDomain.js";
 
+const TURNSTILE_SITEKEY = process.env.TURNSTILE_SITEKEY || "1x00000000000000000000AA";
+
 export default class PostPageController {
     private static CollectAuthorMap(post: Post): Map<string, number> {
         const authorMap = new Map<string, number>();
@@ -73,7 +75,8 @@ export default class PostPageController {
         }
 
         return res.render("post/write.ejs", {
-            title: "게시글 작성"
+            title: "게시글 작성",
+            sitekey: TURNSTILE_SITEKEY
         });
     }
 
@@ -122,7 +125,8 @@ export default class PostPageController {
             post: post,
             attachments: attachments,
             images: images,
-            title: "게시글 수정"
+            title: "게시글 수정",
+            sitekey: TURNSTILE_SITEKEY
         });
     }
 
@@ -168,7 +172,8 @@ export default class PostPageController {
             user: user,
             authorMap: authorMap,
             DateFormat: FormatDatetime,
-            title: post.title
+            title: post.title,
+            sitekey: TURNSTILE_SITEKEY
         });
     }
 }

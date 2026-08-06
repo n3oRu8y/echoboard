@@ -1,3 +1,4 @@
+import TurnstileService from "../../infrastructures/turnstile/TurnstileService.js";
 import Comment from "./CommentDomain.js";
 import type CommentRepository from "./CommentRepository.js";
 import CommentNotFound from "./exceptions/CommentNotFound.js";
@@ -7,7 +8,8 @@ export default class CommentService {
         private repo: CommentRepository
     ) {}
 
-    public async Create(authorId: string, isAnonymous: boolean, content: string, postId: number, parentId: number | null, now: Date = new Date()): Promise<Comment | boolean> {
+    public async Create(authorId: string, isAnonymous: boolean, content: string, postId: number, parentId: number | null, token: string, ip: string, now: Date = new Date()): Promise<Comment | boolean> {
+        await TurnstileService.Verify(token, ip)
         const comment = new Comment(
             null,
             authorId,

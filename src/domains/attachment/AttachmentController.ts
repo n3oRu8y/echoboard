@@ -5,11 +5,18 @@ import FileService from "../file/FileService.js";
 import { LocalFileStorage } from "../../infrastructures/storage/LocalFileStorage.js";
 import AttachmentService from "./AttachmentService.js";
 import AttachmentRepository from "./AttachmentRepository.js";
+import TurnstileFailed from "../../infrastructures/turnstile/exceptions/TurnstileFailed.js";
 
 export default class AttachmentController {
     public static async UploadFile(req: Request, res: Response) {
         if (!req.session?.userId) {
             return res.status(401).json({ status: "error", message: "로그인해주세요." });
+        }
+
+        const token = req.body.token as string;
+        const ip = req.ip!;
+        if (!token) {
+            return res.status(400).json({ status: "error", message: "Turnstile 토큰이 입력되지 않았습니다." });
         }
 
         const userService = new UserService(new UserRepo());
@@ -36,7 +43,16 @@ export default class AttachmentController {
         const saved = await fileService.Save(file, "attachments");
 
         const attachmentService = new AttachmentService(new AttachmentRepository());
-        const attachment = await attachmentService.Create(user.id!, saved.storedName, false, saved.originalName, saved.mimeType, saved.size);
+
+        let attachment = null;
+        try {
+            attachment = await attachmentService.Create(user.id!, saved.storedName, false, saved.originalName, saved.mimeType, saved.size, token, ip);
+        } catch (e) {
+            if (e instanceof TurnstileFailed) {
+                return res.status(403).json({ status: "error", message: "보안 작업을 실패했습니다." });
+            }
+            throw e;
+        }
 
         return res.status(201).json({ 
             status: "ok",
@@ -52,6 +68,12 @@ export default class AttachmentController {
     public static async UploadImage(req: Request, res: Response) {
         if (!req.session?.userId) {
             return res.status(401).json({ status: "error", message: "로그인해주세요." });
+        }
+
+        const token = req.body.token as string;
+        const ip = req.ip!;
+        if (!token) {
+            return res.status(400).json({ status: "error", message: "Turnstile 토큰이 입력되지 않았습니다." });
         }
 
         const userService = new UserService(new UserRepo());
@@ -76,7 +98,15 @@ export default class AttachmentController {
         const saved = await fileService.Save(req.file, "attachments");
 
         const attachmentService = new AttachmentService(new AttachmentRepository());
-        const fileInfo = await attachmentService.Create(user.id!, saved.storedName, true, saved.originalName, saved.mimeType, saved.size);
+        let fileInfo = null;
+        try {
+            fileInfo = await attachmentService.Create(user.id!, saved.storedName, true, saved.originalName, saved.mimeType, saved.size, token, ip);
+        } catch (e) {
+            if (e instanceof TurnstileFailed) {
+                return res.status(403).json({ status: "error", message: "보안 작업을 실패했습니다." });
+            }
+            throw e;
+        }
 
         return res.status(201).json({ 
             status: "ok", 

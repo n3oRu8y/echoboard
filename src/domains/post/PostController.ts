@@ -9,6 +9,7 @@ import BoardRepo from "../board/BoardRepository.js";
 import PostNotFound from "./exceptions/PostNotFound.js";
 import CredentialFailed from "../../common/exceptions/CredentialFailed.js";
 import AttachmentService from "../attachment/AttachmentService.js";
+import TurnstileFailed from "../../infrastructures/turnstile/exceptions/TurnstileFailed.js";
 
 export default class PostController {
     public static async CreatePost(req: Request, res: Response) {
@@ -19,6 +20,12 @@ export default class PostController {
         const { title, content, isAnonymous } = req.body;
         if (!title || !content || isAnonymous == undefined) {
             return res.status(400).json({ status: "error", message: "제목과 내용을 입력해주세요." });
+        }
+
+        const token = req.body.token as string;
+        const ip = req.ip!;
+        if (!token) {
+            return res.status(400).json({ status: "error", message: "Turnstile 토큰이 입력되지 않았습니다." });
         }
 
         const boardId = req.params.boardId as string;
@@ -45,7 +52,7 @@ export default class PostController {
         const attachmentRepo = new AttachmentRepository();
         const attachmentService = new AttachmentService(attachmentRepo);
         const attachments = await attachmentService.GetAttachments(attachmentIds);
-        for(const attachment of attachmentIds) {
+        for(const attachment of attachments) {
             sumOfSize += attachment.size;
         }
 
@@ -64,14 +71,27 @@ export default class PostController {
         }
 
         const postService = new PostService(new PostRepository(), attachmentRepo);
-        const post = await postService.CreatePost(user.id!, title, content, isAnonymous, board.id!, imageIds, attachmentIds);
-
+        let post = null;
+        try {
+            post = await postService.CreatePost(user.id!, title, content, isAnonymous, board.id!, imageIds, attachmentIds, token, ip);
+        } catch (e) {
+            if (e instanceof TurnstileFailed) {
+                return res.status(403).json({ status: "error", message: "보안 작업을 실패했습니다." });
+            }
+            throw e;
+        }
         return res.status(201).json({ status: "success", data: { postId: post.id } });
     }
 
     public static async UpdatePost(req: Request, res: Response) {
         if (!req.session?.userId) {
             return res.status(401).json({ status: "error", message: "로그인해주세요." });
+        }
+
+        const token = req.body.token as string;
+        const ip = req.ip!;
+        if (!token) {
+            return res.status(400).json({ status: "error", message: "Turnstile 토큰이 입력되지 않았습니다." });
         }
 
         const boardId = req.params.boardId as string;
@@ -121,14 +141,21 @@ export default class PostController {
             return res.status(400).json({ status: "error", message: "이미지는 50mb까지 첨부 가능합니다. "});
         }
 
-        const { title, content, isAnonymous } = req.body;
+        const { title, content } = req.body;
+        if (!title || !content) {
+            return res.status(400).json({ status: "error", message: "제목과 내용을 입력해주세요." });
+        }
+
         const postService = new PostService(new PostRepository(), new AttachmentRepository());
         try {
-            await postService.UpdatePost(postId, user.id!, title, content, attachmentIds);
+            await postService.UpdatePost(postId, user.id!, title, content, attachmentIds, token, ip);
         } catch (e) {
             if (e instanceof PostNotFound) {
                 return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });
+            } else if (e instanceof TurnstileFailed) {
+                return res.status(403).json({ status: "error", message: "보안 작업을 실패했습니다." });
             }
+                        
             throw e;
         }
 

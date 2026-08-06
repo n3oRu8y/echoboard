@@ -45,9 +45,14 @@ function addAttachment(attachment) {
 editor.removeHook("addImageBlobHook");
 
 editor.addHook("addImageBlobHook", async (blob, callback) => {
+    const token = await RenderTurnstile();
+    if (!token) {
+        return;
+    }
 
     const formData = new FormData();
     formData.append("image", blob);
+    formData.append("token", token);
 
     const res = await fetch("/api/attachments/image", {
         method: "POST",
@@ -55,7 +60,8 @@ editor.addHook("addImageBlobHook", async (blob, callback) => {
     });
 
     if (!res.ok) {
-        alert("이미지 업로드 실패");
+        const data = await res.json();
+        alert(data.message);
         return;
     }
 
@@ -69,6 +75,10 @@ editor.addHook("addImageBlobHook", async (blob, callback) => {
 
 // 일반 첨부파일 자동 업로드
 document.getElementById("attachment").addEventListener("change", async (e) => {
+    const token = await RenderTurnstile();
+    if (!token) {
+        return;
+    }
 
     const file = e.target.files[0];
 
@@ -77,6 +87,7 @@ document.getElementById("attachment").addEventListener("change", async (e) => {
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("token", token);
 
     const res = await fetch("/api/attachments/file", {
         method: "POST",
@@ -84,7 +95,8 @@ document.getElementById("attachment").addEventListener("change", async (e) => {
     });
 
     if (!res.ok) {
-        alert("파일 업로드 실패");
+        const data = await res.json();
+        alert(data.message);
         return;
     }
 
@@ -99,6 +111,11 @@ document.getElementById("attachment").addEventListener("change", async (e) => {
 
 // 게시글 작성
 document.getElementById("submit").addEventListener("click", async () => {
+    const token = await RenderTurnstile();
+    if (!token) {
+        return;
+    }
+
     if (attachments.length > 5) return alert("파일 첨부는 5개까지 가능합니다.");
 
     const body = {
@@ -106,7 +123,8 @@ document.getElementById("submit").addEventListener("click", async () => {
         content: editor.getHTML(),
         attachmentIds: attachments.map(v => v.id),
         imageIds: images.map(v => v.id),
-        isAnonymous: document.getElementById("is-anonymous").checked
+        isAnonymous: document.getElementById("is-anonymous").checked,
+        token: token
     };
 
     console.log(body);
@@ -120,7 +138,8 @@ document.getElementById("submit").addEventListener("click", async () => {
     });
 
     if (!res.ok) {
-        alert("게시글 작성 실패");
+        const data = await res.json();
+        alert(data.message);
         return;
     }
 

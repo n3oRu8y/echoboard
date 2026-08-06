@@ -16,7 +16,7 @@ deleteBtn?.addEventListener("click", async e => {
 });
 
 const commentForm = document.getElementById("comment-form");
-commentForm.addEventListener("submit", async e => {
+commentForm?.addEventListener("submit", async e => {
     e.preventDefault();
     const formData = new FormData(commentForm);
 
@@ -127,4 +127,38 @@ replyForm.addEventListener("submit", async e => {
     } catch {
         alert("인터넷 연결 상태를 확인해주세요.");
     }
+});
+
+document.querySelectorAll("#reaction-btn").forEach(btn => {
+    btn.addEventListener("click", async e => {
+        let type;
+        if (btn.dataset.reaction == "LIKE") {
+            type = 1;
+        } else if (btn.dataset.reaction == "DISLIKE") {
+            type = 0;
+        } else {
+            return alert("올바르지 않은 동작입니다.");
+        }
+
+        try {
+            const res = await fetch(`/api/boards/${boardUrl}/posts/${postId}/reactions`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    type: type
+                })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                return alert(data.message);
+            } else {
+                return location.reload();
+            }
+        } catch {
+            return alert("인터넷 연결 상태를 확인해주세요.");
+        }
+    });
 });

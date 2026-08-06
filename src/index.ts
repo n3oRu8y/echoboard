@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import redisClient from "./db/redis.js";
 import path from "path";
 import expressLayouts from "express-ejs-layouts";
+import morgan from "morgan";
 import routes from "./routes/index.js";
 import AuthMiddleware from "./middlewares/AuthMiddleware.js";
 import PageNotFound from "./middlewares/PageNotFound.js";
@@ -17,6 +18,8 @@ const PORT = Number(process.env.PORT) || 3000;
 const SESSION_SECRET = `${process.env.SESSION_SECRET}`;
 
 const app = express();
+
+app.use(morgan("combined"));
 
 app.use(session({
     store: new RedisStore({

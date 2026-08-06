@@ -19,6 +19,8 @@ const SESSION_SECRET = `${process.env.SESSION_SECRET}`;
 
 const app = express();
 
+app.set("trust proxy", true);
+
 app.disable('x-powered-by');
 
 app.use(morgan("combined"));

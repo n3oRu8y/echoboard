@@ -8,13 +8,26 @@ import Post from "./PostDomain.js";
 import type PostRepository from "./PostRepositorty.js";
 import type User from "../user/UserDomain.js";
 
-export const safe = (content: string) => sanitize(content, {
-    allowedTags: sanitize.defaults.allowedTags.concat(["img"]),
-    allowedAttributes: {
-        ...sanitize.defaults.allowedAttributes,
-        img: ["src", "alt", "width", "height"]
-    }
-});
+export const safe = (content: string) =>
+    sanitize(content, {
+        allowedTags: sanitize.defaults.allowedTags.concat(["img"]),
+        allowedAttributes: {
+            ...sanitize.defaults.allowedAttributes,
+            img: ["src", "alt", "width", "height"]
+        },
+        transformTags: {
+            img(tagName, attribs) {
+                if (!attribs.src?.startsWith("/api/attachments/")) {
+                    delete attribs.src;
+                }
+
+                return {
+                    tagName,
+                    attribs
+                };
+            }
+        }
+    });
 
 export default class PostService {
     private postRepo: PostRepository;

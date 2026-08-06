@@ -5,6 +5,7 @@ import UserRepo from "../user/UserRepository.js";
 import { ConflictError } from "../../common/exceptions/ConflictError.js";
 import TOTPService from "../../application/totp/TOTPService.js";
 import CredentialFailed from "../../common/exceptions/CredentialFailed.js";
+import HCaptchaFailed from "../../infrastructures/captcha/exceptions/HCaptchaFailed.js";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -64,6 +65,12 @@ export default class AuthController {
             return res.status(403).json({ status: "error", message: "이미 로그인 했습니다." });
         }
 
+        const token = req.body.token as string;
+        const ip = req.ip!;
+        if (!token) {
+            return res.status(400).json({ status: "error", message: "HCaptcha 토큰이 입력되지 않았습니다." });
+        }
+
         const { email, username, password } = req.body;
         if (!email || !username || !password) {
             return res.status(401).json({ status: "error", message: "이메일, 아이디, 비밀번호를 입력해주세요. "});
@@ -79,10 +86,12 @@ export default class AuthController {
 
         try {
             const userService = await new UserService(new UserRepo());
-            await userService.Register(username, password, email);
+            await userService.Register(username, password, email, token, ip);
         } catch (e) {
             if (e instanceof ConflictError) {
                 return res.status(409).json({ status: "error", message: "이메일 또는 아이디가 중복됩니다. "});
+            } else if (e instanceof HCaptchaFailed) {
+                return res.status(403).json({ status: "error", message: "HCaptcha 인증에 실패하였습니다." });
             }
 
             throw e;

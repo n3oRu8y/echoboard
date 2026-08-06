@@ -7,6 +7,7 @@ import type { PrismaClient } from "../../generated/prisma/client.js";
 import type { TransactionClient } from "../../generated/prisma/internal/prismaNamespace.js";
 import prisma from "../../db/prisma.js";
 import { InvalidRole } from "./exceptions/InvalidRole.js";
+import HCaptchaService from "../../infrastructures/captcha/HCaptchaService.js";
 
 export default class UserService {
     constructor(private readonly repo: UserRepo) {}
@@ -19,7 +20,8 @@ export default class UserService {
         return !!(await this.repo.FindByUserId(userId));
     }
 
-    public async Register(username: string, password: string, email: string) {
+    public async Register(username: string, password: string, email: string, token: string, ip: string) {
+        await HCaptchaService.Verify(token, ip);
         const hashed = await argon2.hash(password);
         const user = User.Create(username, hashed, email);
         return await this.repo.Create(user);

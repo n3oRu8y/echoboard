@@ -1,6 +1,7 @@
 import Attachment from "../attachment/AttachmentDomain.js";
 import Board from "../board/BoardDomain.js";
 import Comment from "../comment/CommentDomain.js";
+import Reaction from "../reaction/ReactionDomain.js";
 import User from "../user/UserDomain.js";
 
 export default class Post {
@@ -19,7 +20,7 @@ export default class Post {
         public board: Board | null,
         
         public attachments: Array<Attachment> | null,
-        public reactions: Array<null> | null, // 나중에 추가
+        public reactions: Array<null>,
 
         public readonly createdAt: Date,
         public updatedAt: Date,
@@ -38,7 +39,7 @@ export default class Post {
             boardId,
             null,
             null,
-            null,
+            [],
             createdAt,
             createdAt,
             null
@@ -57,7 +58,7 @@ export default class Post {
             row.boardId,
             row.board ? Board.FromRow(row.board) : null,
             row.attachments ? row.attachments.map((attachment: any) => Attachment.FromRow(attachment)) : null,
-            null, // 수정 필요
+            row.reactions ? row.reactions.map((reaction: any) => Reaction.FromRow(reaction)) : [],
             row.createdAt,
             row.updatedAt,
             row.deletedAt

@@ -77,7 +77,7 @@ export default class PostPageController {
         });
     }
 
-    public static async Update(req: Request, res: Response) {
+    public static async EditPage(req: Request, res: Response) {
         if (!req.session?.userId) {
             return res.redirect("/login");
         }
@@ -107,7 +107,7 @@ export default class PostPageController {
             return res.status(404).render("errors/404.ejs");
 
         const postService = new PostService(new PostRepository(), new AttachmentRepository());
-        const post = await postService.GetPost(postId, true);
+        const post = await postService.GetPost(postId, true, true);
         if (!post) {
             return res.status(404).render("errors/404.ejs");
         }

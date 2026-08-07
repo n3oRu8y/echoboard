@@ -74,10 +74,15 @@ export default class PostController {
             return res.status(400).json({ status: "error", message: "이미지는 50mb까지 첨부 가능합니다. "});
         }
 
+        let isNotice = req.body.isNotice ?? false;
+        if (isNotice && user.role != "ADMIN") {
+            isNotice = false;
+        }
+
         const postService = new PostService(new PostRepository(), attachmentRepo);
         let post = null;
         try {
-            post = await postService.CreatePost(user.id!, title, content, isAnonymous, board.id!, imageIds, attachmentIds, token, ip);
+            post = await postService.CreatePost(user.id!, title, content, isAnonymous, !!isNotice, board.id!, imageIds, attachmentIds, token, ip);
         } catch (e) {
             if (e instanceof TurnstileFailed) {
                 return res.status(403).json({ status: "error", message: "보안 작업을 실패했습니다." });
@@ -154,9 +159,14 @@ export default class PostController {
             return res.status(400).json({ status: "error", message: "제목과 내용을 입력해주세요." });
         }
 
+        let isNotice = req.body.isNotice ?? false;
+        if (isNotice && user.role != "ADMIN") {
+            isNotice = false;
+        }
+
         const postService = new PostService(new PostRepository(), new AttachmentRepository());
         try {
-            await postService.UpdatePost(postId, boardUrl, user.id!, title, content, attachmentIds, token, ip);
+            await postService.UpdatePost(postId, boardUrl, user.id!, title, content, !!isNotice, attachmentIds, token, ip);
         } catch (e) {
             if (e instanceof PostNotFound) {
                 return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });

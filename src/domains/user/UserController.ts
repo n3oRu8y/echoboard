@@ -8,9 +8,7 @@ import { ConflictError } from "../../common/exceptions/ConflictError.js";
 import TOTPService from "../../application/totp/TOTPService.js";
 import prisma from "../../db/prisma.js";
 import TwoFactorNotEnabled from "../../application/totp/exceptions/TwoFactorNotEnabled.js";
-import PermissionDenied from "../../common/exceptions/PermissionDenied.js";
 import { InvalidRole } from "./exceptions/InvalidRole.js";
-import InvalidFormat from "../../common/exceptions/InvalidFormat.js";
 
 export default class UserControler {
     private constructor() {};
@@ -49,6 +47,28 @@ export default class UserControler {
             return res.status(404).json({ status: "error", message: "유저를 찾을 수 없습니다." });
         }
 
+        let skipVerify = true;
+        let oldPassword: string | null = null;
+        if (password && (targetId == req.session.userId || sessionUser.role != "ADMIN")) {
+            skipVerify = false;
+            oldPassword = req.body.oldPassword;
+            if (!oldPassword) {
+                return res.status(401).json({ status: "error", message: "이전 비밀번호를 입력해주세요." });
+            }
+        }
+
+        if ((disable2fa || bannedUntil) && sessionUser.role != "ADMIN") {
+            return res.status(403).json({ status: "error", message: "권한이 없습니다." });
+        }
+
+        if (bannedUntil && Number.isNaN(new Date(bannedUntil).getTime())) {
+            return res.status(400).json({ status: "error", message: "올바르지 않은 입력입니다." });
+        }
+
+        if (role && sessionUser.username != (process.env.OWNER_NAME ?? "admin")) {
+            return res.status(403).json({ status: "error", message: "권한이 없습니다." });
+        }
+
         try {
             await prisma.$transaction(async tx =>  {
                 if (nickname) {
@@ -56,16 +76,7 @@ export default class UserControler {
                 }
 
                 if (password) {
-                    let skipVerfiy = true;
-                    let oldPassword = null;
-                    if (targetId == req.session.userId || sessionUser.role != "ADMIN") {
-                        skipVerfiy = false;
-                        oldPassword = req.body.oldPassword;
-                        if (!oldPassword) {
-                            return res.status(401).json({ status: "error", message: "이전 비밀번호를 입력해주세요." });
-                        }
-                    }
-                    await UserControler.userService.ChangePassword(targetId, password, oldPassword, skipVerfiy, tx);
+                    await UserControler.userService.ChangePassword(targetId, password, oldPassword, skipVerify, tx);
                 }
 
                 if (email) {
@@ -73,27 +84,15 @@ export default class UserControler {
                 }
 
                 if (disable2fa) {
-                    if (sessionUser.role != "ADMIN")
-                        return res.status(403).json({ status: "error", message: "권한이 없습니다." });
                     await UserControler.totpService.Disable(targetId, "", true, tx);
                 }
 
                 if (bannedUntil) {
-                    if (sessionUser.role != "ADMIN") {
-                        return res.status(403).json({ status: "error", message: "권한이 없습니다." });
-                    }
-                    
-                    if (Number.isNaN(new Date(bannedUntil).getTime()))
-                        throw new InvalidFormat();
-
                     const banReason = req.body.banReason ?? null;
                     await UserControler.userService.Ban(targetId, new Date(bannedUntil), banReason, tx);
                 }
 
                 if (role) {
-                    if (sessionUser.username != (process.env.OWNER_NAME ?? "admin")) {
-                        throw new PermissionDenied("Only the owner can change user roles.");
-                    }
                     await UserControler.userService.ChangeRole(targetId, role, tx);
                 }
             });
@@ -106,12 +105,8 @@ export default class UserControler {
                 return res.status(409).json({ status: "error", message: "이메일이 중복됩니다." });
             } else if (e instanceof TwoFactorNotEnabled) {
                 return res.status(409).json({ status: "error", message: "이 유저는 이미 2단계 인증이 비활성화 되어있습니다." });
-            } else if (e instanceof PermissionDenied) {
-                return res.status(403).json({ status: "error", message: "권한이 없습니다." });
             } else if (e instanceof InvalidRole) {
                 return res.status(400).json({ status: "error", message: "올바르지 않은 역할입니다." });
-            } else if (e instanceof InvalidFormat) {
-                return res.status(400).json({ status: "error", message: "올바르지 않은 입력입니다." });
             }
 
             throw e;

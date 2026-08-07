@@ -108,7 +108,7 @@ export default class User {
     }
 
     public SetNickname(nickname: string) {
-        const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,12}$/;
+        const nicknameRegex = /^[ㄱ-힣a-zA-Z0-9]{2,12}$/;
         if (!nicknameRegex.test(nickname))
             throw new ValidationException("Validation failed");
         this.nickname = nickname;

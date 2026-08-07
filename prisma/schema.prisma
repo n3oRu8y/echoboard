@@ -18,25 +18,25 @@ enum Role {
 }
 
 model User {
-  id               String    @id @default(uuid())
-  username         String    @unique
-  password         String
-  email            String    @unique
+  id       String @id @default(uuid())
+  username String @unique
+  password String
+  email    String @unique
 
-  nickname         String?
+  nickname String?
 
-  role             Role      @default(USER)
+  role Role @default(USER)
 
-  bannedUntil      DateTime?
-  banReason        String?
-  
-  twoFactorEnabled Boolean   @default(false)
+  bannedUntil DateTime?
+  banReason   String?
+
+  twoFactorEnabled Boolean @default(false)
   twoFactorSecret  String?
 
-  lastLoginAt      DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  deletedAt        DateTime?
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 
   posts Post[]
 
@@ -48,23 +48,24 @@ model User {
 }
 
 model Board {
-  id          Int       @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  url         String    @unique
+  url         String  @unique
   name        String
   description String?
 
-  createdBy   String
-  canRead     Boolean   @default(true)
-  canWrite    Boolean   @default(true)
-  isPrivate   Boolean   @default(false)
+  createdBy     String
+  canRead       Boolean @default(true)
+  canWrite      Boolean @default(true)
+  isPrivate     Boolean @default(false)
+  isNoticeBoard Boolean @default(false)
 
-  showHome    Boolean   @default(true)
-  showNavbar  Boolean   @default(true)
+  showHome   Boolean @default(true)
+  showNavbar Boolean @default(true)
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   posts Post[]
 }
@@ -72,22 +73,22 @@ model Board {
 model Post {
   id Int @id @default(autoincrement())
 
-  title String
-  content String
+  title       String
+  content     String
   isAnonymous Boolean
-  isNotice Boolean @default(false)
+  isNotice    Boolean @default(false)
 
   authorId String
-  author User @relation(fields: [authorId], references: [id])
-  boardId Int
-  board Board @relation(fields: [boardId], references: [id])
+  author   User   @relation(fields: [authorId], references: [id])
+  boardId  Int
+  board    Board  @relation(fields: [boardId], references: [id])
 
   attachments Attachment[]
-  
+
   reactions PostReaction[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   comments Comment[]
@@ -98,34 +99,34 @@ model Post {
 }
 
 model Attachment {
-  id        String    @id @default(cuid())
+  id String @id @default(cuid())
 
-  authorId  String
-  author    User      @relation(fields: [authorId], references: [id])
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
 
-  postId    Int?
-  post      Post?     @relation(fields: [postId], references: [id])
-  
-  isImage   Boolean   @default(false)
-  fileName  String
-  fileUrl   String    @unique
-  fileType  String
-  size      Int
+  postId Int?
+  post   Post? @relation(fields: [postId], references: [id])
+
+  isImage  Boolean @default(false)
+  fileName String
+  fileUrl  String  @unique
+  fileType String
+  size     Int
 
   createdAt DateTime  @default(now())
   deletedAt DateTime?
 }
 
 model PostReaction {
-  id        Int   @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  userId    String
-  postId    Int
+  userId String
+  postId Int
 
-  type      Int // 1이면 좋아요 0이면 싫어요
+  type Int // 1이면 좋아요 0이면 싫어요
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -139,21 +140,21 @@ model Comment {
   id Int @id @default(autoincrement())
 
   authorId String
-  author User @relation(fields: [authorId], references: [id])
+  author   User   @relation(fields: [authorId], references: [id])
 
   isAnonymous Boolean
-  content String
+  content     String
 
   postId Int
-  post Post @relation(fields: [postId], references: [id])
+  post   Post @relation(fields: [postId], references: [id])
 
   parentId Int?
-  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  parent   Comment? @relation("CommentReplies", fields: [parentId], references: [id])
 
-  replies  Comment[] @relation("CommentReplies")
+  replies Comment[] @relation("CommentReplies")
 
   createdAt DateTime
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   @@index([postId, createdAt])

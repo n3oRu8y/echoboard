@@ -17,6 +17,7 @@ export default class BoardService {
         isPrivate: boolean = false,
         showHome: boolean,
         showNavbar: boolean,
+        isNoticeBoard: boolean = false,
         now: Date = new Date()
     ): Promise<Board> {
         const board = Board.Create(url, name, createdBy, now);
@@ -28,7 +29,12 @@ export default class BoardService {
         board.showHome = showHome;
         board.showNavbar = showNavbar;
 
-        return await this.repo.Create(board);
+        const created = await this.repo.Create(board);
+        if (isNoticeBoard) {
+            await this.repo.SetNoticeBoard(created.id!, true);
+            created.isNoticeBoard = true;
+        }
+        return created;
     }
 
     public async GetAll(withPost: boolean = false, withoutPrivateBoard: boolean = false, ignoreHomeVisibility: boolean = true) {
@@ -128,6 +134,15 @@ export default class BoardService {
         }
         board.description = description;
         await this.repo.Update(boardId, board);
+    }
+
+    public async SetNoticeBoard(boardId: number, enabled: boolean) {
+        const board = await this.repo.FindById(boardId);
+        if (!board) {
+            throw new BoardNotFound(`Could not find a board with the id ${boardId}.`);
+        }
+
+        await this.repo.SetNoticeBoard(boardId, enabled);
     }
 
     public async Delete(boardId: number) {

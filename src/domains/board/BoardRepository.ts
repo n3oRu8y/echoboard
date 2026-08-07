@@ -14,6 +14,7 @@ export default class BoardRepo {
                     canRead: board.canRead,
                     canWrite: board.canWrite,
                     isPrivate: board.isPrivate,
+                    isNoticeBoard: board.isNoticeBoard,
                     showHome: board.showHome,
                     showNavbar: board.showNavbar,
                     createdBy: board.createdBy,
@@ -44,6 +45,7 @@ export default class BoardRepo {
                     canRead: board.canRead,
                     canWrite: board.canWrite,
                     isPrivate: board.isPrivate,
+                    isNoticeBoard: board.isNoticeBoard,
                     showHome: board.showHome,
                     showNavbar: board.showNavbar,
                     createdAt:  board.createdAt,
@@ -127,5 +129,17 @@ export default class BoardRepo {
             }
         });
         return row ? Board.FromRow(row) : null;
+    }
+
+    public async SetNoticeBoard(boardId: number, enabled: boolean) {
+        await prisma.board.update({
+            where: {
+                id: boardId,
+                deletedAt: null
+            },
+            data: {
+                isNoticeBoard: enabled
+            }
+        });
     }
 }

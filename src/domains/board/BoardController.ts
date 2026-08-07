@@ -18,9 +18,12 @@ export default class BoardController {
             return res.status(403).json({ status: "error", message: "관리자만 게시판을 생성할 수 있습니다." });
         }
 
-        const { url, name, description, canWrite, canRead, isPrivate, showHome, showNavbar } = req.body;
+        const { url, name, description, canWrite, canRead, isPrivate, showHome, showNavbar, isNoticeBoard } = req.body;
         if (!url || !name) {
             return res.status(400).json({ status: "error", message: "필수 항목 누락" });
+        }
+        if (isNoticeBoard !== undefined && typeof isNoticeBoard != "boolean") {
+            return res.status(400).json({ status: "error", message: "공지게시판 설정이 올바르지 않습니다." });
         }
 
         try {
@@ -34,7 +37,8 @@ export default class BoardController {
                 canWrite ?? true,
                 isPrivate ?? false,
                 showHome ?? true,
-                showNavbar ?? true
+                showNavbar ?? true,
+                isNoticeBoard ?? false
             );
         } catch (e) {
             if (e instanceof ConflictError) {
@@ -62,10 +66,23 @@ export default class BoardController {
             return res.status(404).json({ status: "error", message: "게시판을 찾을 수 없습니다." });
         }
 
-        const { url, name, description, canRead, canWrite, isPrivate, showHome, showNavbar } = req.body;
+        const { url, name, description, canRead, canWrite, isPrivate, showHome, showNavbar, isNoticeBoard } = req.body;
 
-        if (!url && !name && !description) {
+        if (
+            url === undefined &&
+            name === undefined &&
+            description === undefined &&
+            canRead === undefined &&
+            canWrite === undefined &&
+            isPrivate === undefined &&
+            showHome === undefined &&
+            showNavbar === undefined &&
+            isNoticeBoard === undefined
+        ) {
             return res.status(400).json({ status: "error", message: "변경할 항목을 입력해주세요." });
+        }
+        if (isNoticeBoard !== undefined && typeof isNoticeBoard != "boolean") {
+            return res.status(400).json({ status: "error", message: "공지게시판 설정이 올바르지 않습니다." });
         }
 
         try {
@@ -94,6 +111,10 @@ export default class BoardController {
 
             if (showHome !== undefined || showNavbar != undefined) {
                 await boardService.UpdateVisibility(board.id!, showHome, showNavbar);
+            }
+
+            if (isNoticeBoard !== undefined) {
+                await boardService.SetNoticeBoard(board.id!, isNoticeBoard === true);
             }
         } catch (e) {
             if (e instanceof BoardNotFound) {

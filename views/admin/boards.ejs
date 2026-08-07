@@ -16,6 +16,7 @@
                         <th>읽기</th>
                         <th>쓰기</th>
                         <th>비밀게시판</th>
+                        <th>공지게시판</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -49,6 +50,10 @@
 
                             <td>
                                 <%= board.isPrivate ? "예" : "아니오" %>
+                            </td>
+
+                            <td>
+                                <%= board.isNoticeBoard ? "예" : "아니오" %>
                             </td>
 
                             <td>
@@ -124,6 +129,13 @@
                     </div>
 
                     <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="isNoticeBoard">
+                        <label class="form-check-label">
+                            공지게시판
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
                         <input class="form-check-input" type="checkbox" name="showNavbar" checked>
                         <label class="form-check-label">
                             네비바 표시
@@ -166,6 +178,7 @@ function EditBoard(board) {
     form.elements.canRead.checked = board.canRead;
     form.elements.canWrite.checked = board.canWrite;
     form.elements.isPrivate.checked = board.isPrivate;
+    form.elements.isNoticeBoard.checked = board.isNoticeBoard;
 
     const modal = new bootstrap.Modal(
         document.getElementById("boardModal")
@@ -187,6 +200,7 @@ const createButton = document.getElementById("create-board").addEventListener("c
     form.elements.canRead.checked = true;
     form.elements.canWrite.checked = true;
     form.elements.isPrivate.checked = false;
+    form.elements.isNoticeBoard.checked = false;
 
     const modal = new bootstrap.Modal(
         document.getElementById("boardModal")
@@ -210,6 +224,7 @@ boardForm.addEventListener("submit", async e => {
         canRead: formData.has("canRead"),
         canWrite: formData.has("canWrite"),
         isPrivate: formData.has("isPrivate"),
+        isNoticeBoard: formData.has("isNoticeBoard"),
     };
 
     const id = formData.get("boardId");

@@ -52,7 +52,7 @@ export default class PostService {
         });
     }
 
-    public async UpdatePost(postId: number, boardUrl: string, user: User, title: string, content: string, isNotice: boolean, attachmentIds: Array<string>, token: string, ip: string) {
+    public async UpdatePost(postId: number, boardUrl: string, user: User, title: string | undefined, content: string | undefined, isNotice: boolean, attachmentIds: Array<string>, token: string, ip: string) {
         await TurnstileService.Verify(token, ip);
         await prisma.$transaction(async tx => {
             const post = await this.postRepo.FindByIdAndBoardUrl(postId, boardUrl);
@@ -62,22 +62,23 @@ export default class PostService {
 
             const isAuthor = post.authorId == user.id;
             const isAdmin = user.role == "ADMIN";
-            if (!isAuthor && !isAdmin) {
-                throw new CredentialFailed("Only the author or the administrator can edit this post.");
-            }
-
-            if (post.isNotice != isNotice && !isAdmin) {
-                throw new CredentialFailed("Only the administrator can close notice.");
-            }
-
-            if (!isAuthor) {
-                if (post.title != title || post.content != content) {
-                    throw new CredentialFailed("Only the author can edit the title or content.");
+            const isNoticeOnly = title == undefined && content == undefined;
+            if (isNoticeOnly) {
+                if (!isAdmin) {
+                    throw new CredentialFailed("Only the administrator can change notice status.");
                 }
 
                 post.isNotice = isNotice;
                 await this.postRepo.Update(postId, post, tx);
                 return;
+            }
+
+            if (title == undefined || content == undefined || !isAuthor) {
+                throw new CredentialFailed("Only the author can edit this post.");
+            }
+
+            if (post.isNotice != isNotice && !isAdmin) {
+                throw new CredentialFailed("Only the administrator can change notice status.");
             }
 
             post.title = title;

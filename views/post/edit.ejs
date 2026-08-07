@@ -194,7 +194,7 @@ document.getElementById("submit").addEventListener("click", async () => {
         imageIds: images.map(v => v.id),
         isAnonymous: document.getElementById("is-anonymous").checked,
         token: token,
-        isNotice: document.getElementById("is-notice").checked,
+        isNotice: document.getElementById("is-notice")?.checked ?? false,
     };
 
     console.log(body);

@@ -74,15 +74,15 @@ export default class PostController {
             return res.status(400).json({ status: "error", message: "이미지는 50mb까지 첨부 가능합니다. "});
         }
 
-        let isNotice = req.body.isNotice ?? false;
-        if (isNotice && user.role != "ADMIN") {
-            isNotice = false;
+        if (req.body.isNotice != undefined && typeof req.body.isNotice != "boolean") {
+            return res.status(400).json({ status: "error", message: "공지 여부가 올바르지 않습니다." });
         }
+        const isNotice = user.role == "ADMIN" && req.body.isNotice === true;
 
         const postService = new PostService(new PostRepository(), attachmentRepo);
         let post = null;
         try {
-            post = await postService.CreatePost(user.id!, title, content, isAnonymous, !!isNotice, board.id!, imageIds, attachmentIds, token, ip);
+            post = await postService.CreatePost(user.id!, title, content, isAnonymous, isNotice, board.id!, imageIds, attachmentIds, token, ip);
         } catch (e) {
             if (e instanceof TurnstileFailed) {
                 return res.status(403).json({ status: "error", message: "보안 작업을 실패했습니다." });
@@ -155,18 +155,23 @@ export default class PostController {
         }
 
         const { title, content } = req.body;
-        if (title == "" || content == "" || title === null || content === null) {
+        const isNoticeOnly = title == undefined && content == undefined;
+        if (isNoticeOnly && (user.role != "ADMIN" || typeof req.body.isNotice != "boolean")) {
+            return res.status(403).json({ status: "error", message: "권한이 없습니다." });
+        }
+
+        if (!isNoticeOnly && (typeof title != "string" || typeof content != "string" || title == "" || content == "")) {
             return res.status(400).json({ status: "error", message: "제목과 내용을 입력해주세요." });
         }
 
-        let isNotice = req.body.isNotice ?? false;
-        if (isNotice && user.role != "ADMIN") {
-            isNotice = false;
+        if (req.body.isNotice != undefined && typeof req.body.isNotice != "boolean") {
+            return res.status(400).json({ status: "error", message: "공지 여부가 올바르지 않습니다." });
         }
+        const isNotice = user.role == "ADMIN" && req.body.isNotice === true;
 
         const postService = new PostService(new PostRepository(), new AttachmentRepository());
         try {
-            await postService.UpdatePost(postId, boardUrl, user, title, content, !!isNotice, attachmentIds.concat(imageIds), token, ip);
+            await postService.UpdatePost(postId, boardUrl, user, title, content, isNotice, attachmentIds.concat(imageIds), token, ip);
         } catch (e) {
             if (e instanceof PostNotFound) {
                 return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });

@@ -121,6 +121,28 @@ export default class PostRepository {
         return result;
     }
 
+    public async FindGlobalNotices(): Promise<Array<Post>> {
+        const rows = await prisma.post.findMany({
+            where: {
+                isNotice: true,
+                deletedAt: null,
+                board: {
+                    isNoticeBoard: true,
+                    deletedAt: null
+                }
+            },
+            include: {
+                author: true,
+                board: true
+            },
+            orderBy: {
+                id: "desc"
+            }
+        });
+
+        return rows.map(row => Post.FromRow(row));
+    }
+
     public async FindByUserId(userId: string, limit: number, offset: number, query: string | null) {
         const rows = await prisma.post.findMany({
             take: limit,

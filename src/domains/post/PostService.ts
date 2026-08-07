@@ -140,6 +140,10 @@ export default class PostService {
         return await this.postRepo.FetchBoardPostCount(boardId, query);
     }
 
+    public async GetGlobalNotices() {
+        return await this.postRepo.FindGlobalNotices();
+    }
+
     public async GetUserPosts(userId: string, page: number = 1, query: string | null = null) {
         if (page < 1) {
             throw new ValidationException("Invalid page");

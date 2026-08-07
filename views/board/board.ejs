@@ -33,6 +33,26 @@
     </div>
 </div>
 
+<% if (globalNotices.length > 0) { %>
+    <div class="card border-danger mb-4">
+        <div class="card-header bg-danger-subtle text-danger-emphasis fw-semibold">
+            공지사항
+        </div>
+        <div class="list-group list-group-flush">
+            <% globalNotices.forEach(notice => { %>
+                <a
+                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center gap-3"
+                    href="/boards/<%= notice.board.url %>/<%= notice.id %>">
+                    <span class="text-truncate">
+                        <span class="badge bg-danger me-2">공지</span><%= notice.title %>
+                    </span>
+                    <small class="text-muted text-nowrap"><%= format(notice.createdAt) %></small>
+                </a>
+            <% }); %>
+        </div>
+    </div>
+<% } %>
+
 <div class="table-responsive">
     <table class="table table-hover align-middle mb-0" style="table-layout: fixed;">
         <thead class="table-light">

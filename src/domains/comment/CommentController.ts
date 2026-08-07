@@ -45,7 +45,8 @@ export default class CommentController {
             return res.status(400).json({ status: "error", message: "Turnstile 토큰이 입력되지 않았습니다." });
         }
 
-        const board = await CommentController.boardService.GetByUrl(req.params.boardUrl as string, true);
+        const boardUrl = req.params.boardUrl as string;
+        const board = await CommentController.boardService.GetByUrl(boardUrl, true);
         if (!board) {
             return res.status(404).json({ status: "error", message: "게시판을 찾을 수 없습니다." });
         }
@@ -54,7 +55,7 @@ export default class CommentController {
         if (!Number.isInteger(postId) || postId < 0) 
             return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });
 
-        const post = await CommentController.postService.GetPost(postId, true);
+        const post = await CommentController.postService.GetPost(postId, boardUrl, true);
         if (!post)
             return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });
 
@@ -88,7 +89,8 @@ export default class CommentController {
             return res.status(401).json({ status: "error", message: "로그인해주세요." });
         }
 
-        const board = await CommentController.boardService.GetByUrl(req.params.boardUrl as string, true);
+        const boardUrl = req.params.boardUrl as string;
+        const board = await CommentController.boardService.GetByUrl(boardUrl, true);
         if (!board) {
             return res.status(404).json({ status: "error", message: "게시판을 찾을 수 없습니다." });
         }
@@ -97,7 +99,7 @@ export default class CommentController {
         if (!Number.isInteger(postId) || postId < 0) 
             return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });
 
-        const post = await CommentController.postService.GetPost(postId, true);
+        const post = await CommentController.postService.GetPost(postId, boardUrl, true);
         if (!post)
             return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });
 

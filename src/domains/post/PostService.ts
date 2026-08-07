@@ -52,10 +52,10 @@ export default class PostService {
         });
     }
 
-    public async UpdatePost(postId: number, authorId: string, title: string, content: string, attachmentIds: Array<string>, token: string, ip: string) {
+    public async UpdatePost(postId: number, boardUrl: string, authorId: string, title: string, content: string, attachmentIds: Array<string>, token: string, ip: string) {
         await TurnstileService.Verify(token, ip);
         await prisma.$transaction(async tx => {
-            const post = await this.postRepo.FindById(postId);
+            const post = await this.postRepo.FindByIdAndBoardUrl(postId, boardUrl);
             if (!post) {
                 throw new PostNotFound(`Could not find a post with the id ${postId}.`);
             }
@@ -69,8 +69,8 @@ export default class PostService {
         });
     }
 
-    public async DeletePost(postId: number, user: User, now: Date = new Date()) {
-        const post = await this.postRepo.FindById(postId);
+    public async DeletePost(postId: number, boardUrl: string, user: User, now: Date = new Date()) {
+        const post = await this.postRepo.FindByIdAndBoardUrl(postId, boardUrl);
         if (!post) {
             throw new PostNotFound(`Could not find a post with the id ${postId}.`);
         }
@@ -83,12 +83,12 @@ export default class PostService {
         await this.postRepo.Update(postId, post);
     }
 
-    public async GetPost(postId: number): Promise<Post>;
-    public async GetPost(postId: number, silent: false, withFk?: boolean): Promise<Post>;
-    public async GetPost(postId: number, silent: true, withFk?: boolean): Promise<Post | null>;
+    public async GetPost(postId: number, boardUrl: string): Promise<Post>;
+    public async GetPost(postId: number, boardUrl: string, silent: false, withFk?: boolean): Promise<Post>;
+    public async GetPost(postId: number, boardUrl: string, silent: true, withFk?: boolean): Promise<Post | null>;
 
-    public async GetPost(postId: number, silent: boolean = false, withFk: boolean = false) {
-        const post = await this.postRepo.FindById(postId, withFk, withFk, withFk, withFk, withFk);
+    public async GetPost(postId: number, boardUrl: string, silent: boolean = false, withFk: boolean = false) {
+        const post = await this.postRepo.FindByIdAndBoardUrl(postId, boardUrl, withFk, withFk, withFk, withFk, withFk);
         if (!post && !silent) {
             throw new PostNotFound(`Could not find a post with the id ${postId}.`);
         }

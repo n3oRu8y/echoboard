@@ -93,7 +93,7 @@ export default class PostPageController {
             });
         }
 
-        const boardUrl = req.params.boardUrl;
+        const boardUrl = req.params.boardUrl as string;
         const boardService = new BoardService(new BoardRepo()); 
         const board = await boardService.GetByUrl(boardUrl as string, true);
 
@@ -110,7 +110,7 @@ export default class PostPageController {
             return res.status(404).render("errors/404.ejs");
 
         const postService = new PostService(new PostRepository(), new AttachmentRepository());
-        const post = await postService.GetPost(postId, true, true);
+        const post = await postService.GetPost(postId, boardUrl, true, true);
         if (!post) {
             return res.status(404).render("errors/404.ejs");
         }
@@ -153,7 +153,7 @@ export default class PostPageController {
             return res.status(404).render("errors/404.ejs");
 
         const postSeervice = new PostService(new PostRepository(), new AttachmentRepository());
-        const post = await postSeervice.GetPost(postId, true, true);
+        const post = await postSeervice.GetPost(postId, boardUrl, true, true);
         if (!post)
             return res.status(404).render("errors/404.ejs");
 

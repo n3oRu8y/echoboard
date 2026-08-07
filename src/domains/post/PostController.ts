@@ -94,9 +94,9 @@ export default class PostController {
             return res.status(400).json({ status: "error", message: "Turnstile 토큰이 입력되지 않았습니다." });
         }
 
-        const boardId = req.params.boardId as string;
+        const boardUrl = req.params.boardUrl as string;
         const boardService = new BoardService(new BoardRepo());
-        const board = await boardService.GetByUrl(boardId, true);
+        const board = await boardService.GetByUrl(boardUrl, true);
         if (!board) {
             return res.status(404).json({ status: "error", message: "게시판을 찾을 수 없습니다." });
         }
@@ -148,7 +148,7 @@ export default class PostController {
 
         const postService = new PostService(new PostRepository(), new AttachmentRepository());
         try {
-            await postService.UpdatePost(postId, user.id!, title, content, attachmentIds, token, ip);
+            await postService.UpdatePost(postId, boardUrl, user.id!, title, content, attachmentIds, token, ip);
         } catch (e) {
             if (e instanceof PostNotFound) {
                 return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });
@@ -167,9 +167,9 @@ export default class PostController {
             return res.status(401).json({ status: "error", message: "로그인해주세요." });
         }
 
-        const boardId = req.params.boardId as string;
+        const boardUrl = req.params.boardUrl as string;
         const boardService = new BoardService(new BoardRepo());
-        const board = await boardService.GetByUrl(boardId, true);
+        const board = await boardService.GetByUrl(boardUrl, true);
         if (!board) {
             return res.status(404).json({ status: "error", message: "게시판을 찾을 수 없습니다." });
         }
@@ -188,7 +188,7 @@ export default class PostController {
 
         const postService = new PostService(new PostRepository(), new AttachmentRepository());
         try {
-            await postService.DeletePost(postId, user);
+            await postService.DeletePost(postId, boardUrl, user);
         } catch (e) {
             if (e instanceof PostNotFound) {
                 return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });

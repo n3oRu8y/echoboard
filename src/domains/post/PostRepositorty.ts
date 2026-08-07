@@ -19,10 +19,13 @@ export default class PostRepository {
         return Post.FromRow(row);
     }
 
-    public async FindById(id: number, withAuthor: boolean = false, withBoard: boolean = false, withAttachments: boolean = false, withReactions: boolean = false, withComment: boolean = true) {
+    public async FindByIdAndBoardUrl(id: number, boardUrl: string, withAuthor: boolean = false, withBoard: boolean = false, withAttachments: boolean = false, withReactions: boolean = false, withComment: boolean = true) {
         const row = await prisma.post.findFirst({
             where: {
                 id: id,
+                board: {
+                    url: boardUrl
+                },
                 deletedAt: null,
             }, include: {
                 author: withAuthor,

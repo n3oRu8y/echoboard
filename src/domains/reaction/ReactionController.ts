@@ -55,7 +55,7 @@ export default class ReactionController {
             return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다."});
         }
 
-        const post = await ReactionController.postService.GetPost(postId, true);
+        const post = await ReactionController.postService.GetPost(postId, boardUrl, true);
         if (!post) {
             return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다."});
         }

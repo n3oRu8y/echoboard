@@ -124,7 +124,8 @@ document.getElementById("submit").addEventListener("click", async () => {
         attachmentIds: attachments.map(v => v.id),
         imageIds: images.map(v => v.id),
         isAnonymous: document.getElementById("is-anonymous").checked,
-        token: token
+        token: token,
+        isNotice: document.getElementById("is-notice").checked,
     };
 
     console.log(body);

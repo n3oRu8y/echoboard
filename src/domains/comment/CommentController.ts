@@ -60,10 +60,17 @@ export default class CommentController {
             return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });
 
         const parentId = req.body.parentId;
+        let parsedParentId: number | null = null;
         if (parentId != undefined && parentId != null) {
-            const comment = CommentController.commentService.Get(Number(parentId));
-            if (!comment) 
+            parsedParentId = Number(parentId);
+            if (!Number.isInteger(parsedParentId) || parsedParentId < 1) {
                 return res.status(404).json({ status: "error", message: "원댓글을 찾을 수 없습니다." });
+            }
+
+            const parentComment = await CommentController.commentService.Get(parsedParentId);
+            if (!parentComment || parentComment.postId != post.id || parentComment.parentId != null || parentComment.deletedAt != null) {
+                return res.status(404).json({ status: "error", message: "원댓글을 찾을 수 없습니다." });
+            }
         }
 
         const userService = new UserService(new UserRepo());
@@ -77,7 +84,7 @@ export default class CommentController {
         }
 
         try {
-            await CommentController.commentService.Create(req.session.userId, isAnonymous, req.body.content, post.id!, (parentId != undefined && parentId != null) ? Number(parentId) : null, token, ip);
+            await CommentController.commentService.Create(req.session.userId, isAnonymous, req.body.content, post.id!, parsedParentId, token, ip);
         } catch (e) {
             if (e instanceof TurnstileFailed) {
                 return res.status(403).json({ status: "error", message: "보안 작업을 실패했습니다." });

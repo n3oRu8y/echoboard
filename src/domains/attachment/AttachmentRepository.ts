@@ -69,8 +69,8 @@ export default class AttachmentRepository {
         return result;
     }
 
-    public async Update(attachmentId: string, attachment: Attachment) {
-        await prisma.attachment.update({
+    public async Update(attachmentId: string, attachment: Attachment, db: PrismaClient | Prisma.TransactionClient = prisma) {
+        await db.attachment.update({
             data: {
                 postId: attachment.postId,
                 deletedAt: attachment.deletedAt

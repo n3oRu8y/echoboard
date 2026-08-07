@@ -70,7 +70,7 @@ export default class PostService {
     }
 
     public async DeletePost(postId: number, boardUrl: string, user: User, now: Date = new Date()) {
-        const post = await this.postRepo.FindByIdAndBoardUrl(postId, boardUrl);
+        const post = await this.postRepo.FindByIdAndBoardUrl(postId, boardUrl, false, false, true);
         if (!post) {
             throw new PostNotFound(`Could not find a post with the id ${postId}.`);
         }
@@ -80,7 +80,18 @@ export default class PostService {
         }
 
         post.deletedAt = now;
-        await this.postRepo.Update(postId, post);
+        await prisma.$transaction(async tx => {
+            await this.postRepo.Update(postId, post, tx);
+
+            for (const attachment of post.attachments ?? []) {
+                if (attachment.deletedAt) {
+                    continue;
+                }
+
+                attachment.deletedAt = now;
+                await this.AttachmentRepo.Update(attachment.id!, attachment, tx);
+            }
+        });
     }
 
     public async GetPost(postId: number, boardUrl: string): Promise<Post>;

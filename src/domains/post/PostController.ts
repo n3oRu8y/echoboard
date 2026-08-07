@@ -166,7 +166,7 @@ export default class PostController {
 
         const postService = new PostService(new PostRepository(), new AttachmentRepository());
         try {
-            await postService.UpdatePost(postId, boardUrl, user, title, content, !!isNotice, attachmentIds, token, ip);
+            await postService.UpdatePost(postId, boardUrl, user, title, content, !!isNotice, attachmentIds.concat(imageIds), token, ip);
         } catch (e) {
             if (e instanceof PostNotFound) {
                 return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });

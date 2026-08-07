@@ -60,12 +60,24 @@ export default class PostService {
                 throw new PostNotFound(`Could not find a post with the id ${postId}.`);
             }
 
-            if ((post.title != title || post.content != content) && post.authorId != user.id) {
-                throw new CredentialFailed("Only the author can edit this post.");
+            const isAuthor = post.authorId == user.id;
+            const isAdmin = user.role == "ADMIN";
+            if (!isAuthor && !isAdmin) {
+                throw new CredentialFailed("Only the author or the administrator can edit this post.");
             }
 
-            if (post.isNotice != isNotice && user.role != "ADMIN") {
+            if (post.isNotice != isNotice && !isAdmin) {
                 throw new CredentialFailed("Only the administrator can close notice.");
+            }
+
+            if (!isAuthor) {
+                if (post.title != title || post.content != content) {
+                    throw new CredentialFailed("Only the author can edit the title or content.");
+                }
+
+                post.isNotice = isNotice;
+                await this.postRepo.Update(postId, post, tx);
+                return;
             }
 
             post.title = title;

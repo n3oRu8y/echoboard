@@ -26,7 +26,7 @@ export default class UserPageController {
 
     public static async MyPage(req: Request, res: Response) {
         if (!req.session?.userId) {
-            return res.redirect("/login");
+            return res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
         }
 
         const user = await UserPageController.userService.GetUserWithUserId(req.session.userId, false, true);
@@ -39,7 +39,7 @@ export default class UserPageController {
 
     public static async Nickname(req: Request, res: Response) {
         if (!req.session?.userId) {
-            return res.redirect("/login");
+            return res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
         }
 
         const user = await UserPageController.userService.GetUserWithUserId(req.session.userId);
@@ -51,7 +51,7 @@ export default class UserPageController {
 
     public static async Password(req: Request, res: Response) {
         if (!req.session?.userId) {
-            return res.redirect("/login");
+            return res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
         }
 
         const user = await UserPageController.userService.GetUserWithUserId(req.session.userId);
@@ -63,7 +63,7 @@ export default class UserPageController {
 
     public static async TwoFactorRegister(req: Request, res: Response) {
         if (!req.session?.userId) {
-            return res.redirect("/login");
+            return res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
         }
 
         const user = await UserPageController.userService.GetUserWithUserId(req.session.userId);
@@ -84,7 +84,7 @@ export default class UserPageController {
 
     public static async WithdrawPage(req: Request, res: Response) {
         if (!req.session?.userId) {
-            return res.redirect("/login");
+            return res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
         }
 
         return res.render("user/withdraw.ejs", { title: "회원탈퇴" });
@@ -92,7 +92,7 @@ export default class UserPageController {
 
     public static async GetMyPosts(req: Request, res: Response) {
         if (!req.session?.userId) {
-            return res.redirect("/login");
+            return res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
         }
 
         const query = req.query.query as string;

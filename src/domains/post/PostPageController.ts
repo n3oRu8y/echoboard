@@ -51,7 +51,7 @@ export default class PostPageController {
 
     public static async Write(req: Request, res: Response) {
         if (!req.session?.userId) {
-            return res.redirect("/login");
+            return res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
         }
 
         const userService = new UserService(new UserRepo());
@@ -82,7 +82,7 @@ export default class PostPageController {
 
     public static async EditPage(req: Request, res: Response) {
         if (!req.session?.userId) {
-            return res.redirect("/login");
+            return res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
         }
 
         const userService = new UserService(new UserRepo());

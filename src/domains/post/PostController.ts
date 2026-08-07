@@ -155,7 +155,7 @@ export default class PostController {
         }
 
         const { title, content } = req.body;
-        if (!title || !content) {
+        if (title == "" || content == "" || title === null || content === null) {
             return res.status(400).json({ status: "error", message: "제목과 내용을 입력해주세요." });
         }
 

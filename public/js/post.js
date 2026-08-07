@@ -174,3 +174,34 @@ document.querySelectorAll("#reaction-btn").forEach(btn => {
         }
     });
 });
+
+document.querySelectorAll("#close-notice").forEach(btn => {
+    btn.addEventListener("click", async e => {
+        if (!confirm("공지를 내리겠습니까?")) return;
+        try {
+            const token = await RenderTurnstile();
+            if (!token) return;
+
+            const res = await fetch(`/api/boards/${boardUrl}/posts/${postId}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    isNotice: false,
+                    token: token
+                })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                return alert(data.message);
+            }
+
+            alert("공지를 내렸습니다.");
+            return location.reload();
+        } catch {
+            return alert("인터넷 연결 상태를 확인해주세요.");
+        }
+    });
+});

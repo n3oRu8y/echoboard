@@ -61,7 +61,7 @@ export default class PostService {
             }
 
             post.title = title;
-            post.content = content;
+            post.content = safe(content);
             // post.isAnonymous = isAnonymous;
 
             await this.postRepo.Update(postId, post, tx);

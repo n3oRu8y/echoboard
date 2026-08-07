@@ -52,6 +52,7 @@
 <%- include("../components/turnstile.ejs") %>
 
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script type="application/json" id="edit-data"><%- JSON.stringify({ postContent: post.content, attachments, images }).replace(/</g, "\\u003c") %></script>
 <script>
 const segments = window.location.pathname
     .split("/")
@@ -59,8 +60,9 @@ const segments = window.location.pathname
 
 const boardId = segments[1];
 
-const attachments = <%- JSON.stringify(attachments) %>;
-const images = <%- JSON.stringify(images) %>;
+const { postContent, attachments, images } = JSON.parse(
+    document.querySelector("#edit-data").textContent
+);
 
 for(const attachment of attachments) {
     addAttachment(attachment);
@@ -70,7 +72,7 @@ const editor = new toastui.Editor({
     el: document.querySelector("#editor"),
     height: "500px",
     initialEditType: "wysiwyg",
-    initialValue: `<%- post.content %>`
+    initialValue: postContent
 });
 
 // 첨부파일 목록 표시

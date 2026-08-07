@@ -1,1 +1,0 @@
-ALTER TABLE "Board" ADD COLUMN "isNoticeBoard" BOOLEAN NOT NULL DEFAULT false;

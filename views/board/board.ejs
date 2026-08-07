@@ -58,6 +58,9 @@
 
                     <td>
                         <div class="text-truncate">
+                            <% if (post.isNotice) { %>
+                                <span class="badge bg-danger ms-1">공지</span>
+                            <% } %>
                             <%= post.title %>
                         </div>
                     </td>

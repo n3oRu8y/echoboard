@@ -8,6 +8,9 @@
                         <% board.posts.forEach(post => { %>
                             <a href="/boards/<%= board.url %>/<%= post.id %>" class="list-group-item list-group-item-action d-flex justify-content-between">
                                 <span class="flex-grow-1 text-truncate">
+                                    <% if (post.isNotice) { %>
+                                        <span class="badge bg-danger ms-1">공지</span>
+                                    <% } %>
                                     <%= post.title %>
                                 </span>
                                 <small class="text-nowrap ms-3" style="width: 60px; text-align: center;">

@@ -53,13 +53,14 @@ export default class PostRepository {
         return row ? Post.FromRow(row) : null;
     }
 
-    public async FindByBoardId(boardId: number, limit: number = 10, offset: number = 10, query: string | null): Promise<Array<Post>> {
+    public async FindByBoardId(boardId: number, limit: number = 10, offset: number = 10, query: string | null, authorId: string | null = null): Promise<Array<Post>> {
         const rows = await prisma.post.findMany({
             take: limit,
             skip: offset,
             where: {
                 boardId: boardId,
                 deletedAt: null,
+                ...(authorId && { authorId: authorId }),
                 ...(query && {
                     OR: [
                             {
@@ -96,11 +97,12 @@ export default class PostRepository {
         return result;
     }
 
-    public async FetchBoardPostCount(boardId: number, query: string | null) {
+    public async FetchBoardPostCount(boardId: number, query: string | null, authorId: string | null = null) {
         const result = await prisma.post.count({
             where: {
                 deletedAt: null,
                 boardId: boardId,
+                ...(authorId && { authorId: authorId }),
                 ...(query && {
                     OR: [
                             {
@@ -128,6 +130,7 @@ export default class PostRepository {
                 deletedAt: null,
                 board: {
                     isNoticeBoard: true,
+                    isPrivate: false,
                     deletedAt: null
                 }
             },

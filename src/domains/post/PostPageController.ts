@@ -148,6 +148,10 @@ export default class PostPageController {
             if (!user || user.role != "ADMIN")
                 return res.status(403).render("errors/alert.ejs", { message: "권한이 없습니다." });
 
+        if (board.isPrivate && !user) {
+            return res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
+        }
+
         const postId = Number(req.params.postId);
         if (!Number.isInteger(postId) || postId < 0)
             return res.status(404).render("errors/404.ejs");
@@ -156,6 +160,10 @@ export default class PostPageController {
         const post = await postSeervice.GetPost(postId, boardUrl, true, true);
         if (!post)
             return res.status(404).render("errors/404.ejs");
+
+        if (board.isPrivate && user?.role != "ADMIN" && post.authorId != user?.id) {
+            return res.status(404).render("errors/404.ejs");
+        }
 
         const authorMap = PostPageController.CollectAuthorMap(post);
         for(let comment of post.comments) {

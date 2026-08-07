@@ -66,7 +66,7 @@ export default class BoardRepo {
         }
     }
 
-    public async FetchAll(withPost: boolean = false, withPrivateBoard: boolean = false, ignoreHomeVisibility: boolean = true) {
+    public async FetchAll(withPost: boolean = false, withPrivateBoard: boolean = false, ignoreHomeVisibility: boolean = true, viewerId: string | null = null, isAdmin: boolean = false) {
         const rows = await prisma.board.findMany({
             where: {
                 deletedAt: null,
@@ -90,7 +90,17 @@ export default class BoardRepo {
                             author: true
                         },
                         where: {
-                            deletedAt: null
+                            deletedAt: null,
+                            ...(!isAdmin && {
+                                OR: [
+                                    {
+                                        board: {
+                                            isPrivate: false
+                                        }
+                                    },
+                                    ...(viewerId ? [{ authorId: viewerId }] : [])
+                                ]
+                            })
                         },
                         orderBy: [
                             {

@@ -128,16 +128,16 @@ export default class PostService {
         return post;
     }
 
-    public async GetBoardPosts(boardId: number, page: number = 1, query: string | null = null) {
+    public async GetBoardPosts(boardId: number, page: number = 1, query: string | null = null, authorId: string | null = null) {
         if (page < 1) {
             throw new ValidationException("Invalid page");
         }
 
-        return await this.postRepo.FindByBoardId(boardId, 10, (page - 1) * 10, query);
+        return await this.postRepo.FindByBoardId(boardId, 10, (page - 1) * 10, query, authorId);
     }
 
-    public async GetBoardPostCount(boardId: number, query: string | null = null) {
-        return await this.postRepo.FetchBoardPostCount(boardId, query);
+    public async GetBoardPostCount(boardId: number, query: string | null = null, authorId: string | null = null) {
+        return await this.postRepo.FetchBoardPostCount(boardId, query, authorId);
     }
 
     public async GetGlobalNotices() {

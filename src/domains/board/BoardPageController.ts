@@ -11,7 +11,8 @@ import FormatDatetime from "../../common/utils/FormatDatetime.js";
 export default class BoardPageController {
     public static async RenderBoardList(req: Request, res: Response) {
         const boardService = new BoardService(new BoardRepo());
-        const boards = await boardService.GetAll(true, true, false);
+        const user = req.session.user;
+        const boards = await boardService.GetAll(true, true, false, user?.id ?? null, user?.role == "ADMIN");
         return res.render("board/boards.ejs", {
             boards: boards,
             format: FormatDatetime,
@@ -26,25 +27,35 @@ export default class BoardPageController {
             return res.status(404).render("errors/404.ejs");
         }
 
+        const userService = new UserService(new UserRepo());
+        const user = req.session.userId
+            ? await userService.GetUserWithUserId(req.session.userId)
+            : null;
+
         if (!board.canRead) {
-            if (!req.session.userId) {
+            if (!user) {
                 return res.status(401).render("errors/alert.ejs", { message : "로그인이 필요합니다." });
             }
 
-            const userService = new UserService(new UserRepo());
-            const user = await userService.GetUserWithUserId(req.session.userId);
             if (user.role != "ADMIN") return res.status(401).render("errors/alert.ejs", { message : "게시판 보기 권한이 없습니다." });
+        }
+
+        if (board.isPrivate && !user) {
+            return res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
         }
 
         let page = Number(req.query.page ?? 1);
         if (!Number.isInteger(page) || page < 1) page = 1;
 
         const query = req.query.query as string;
+        const authorId = board.isPrivate && user?.role != "ADMIN"
+            ? user!.id!
+            : null;
 
         const postService = new PostService(new PostRepository(), new AttachmentRepository());
-        const posts = await postService.GetBoardPosts(board.id!, page, query);
+        const posts = await postService.GetBoardPosts(board.id!, page, query, authorId);
         const globalNotices = await postService.GetGlobalNotices();
-        const totalPosts = await postService.GetBoardPostCount(board.id!, query);
+        const totalPosts = await postService.GetBoardPostCount(board.id!, query, authorId);
         const totalPages = Math.max(1, Math.ceil(totalPosts / 10));
         
         return res.render("board/board.ejs", {

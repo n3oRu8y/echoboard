@@ -90,9 +90,14 @@ export default class BoardRepo {
                         where: {
                             deletedAt: null
                         },
-                        orderBy: {
-                            id: "desc"
-                        }
+                        orderBy: [
+                            {
+                                isNotice: "desc"
+                            },
+                            {
+                                id: "desc"
+                            }
+                        ]
                     }
                 }
             })

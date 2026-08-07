@@ -9,6 +9,7 @@ export default class PostRepository {
                 title: post.title,
                 content: post.content,
                 isAnonymous: post.isAnonymous,
+                isNotice: post.isNotice,
                 authorId: post.authorId,
                 boardId: post.boardId,
                 createdAt: post.createdAt,
@@ -77,9 +78,14 @@ export default class PostRepository {
             include: {
                 author: true
             },
-            orderBy: {
-                id: "desc",
-            }
+            orderBy: [
+                {
+                    isNotice: "desc"
+                },
+                {
+                    id: "desc"
+                }
+            ]
         });
         
         const result: Array<Post> = [];
@@ -185,6 +191,7 @@ export default class PostRepository {
             data: {
                 title: post.title,
                 content: post.content,
+                isNotice: post.isNotice,
                 deletedAt: post.deletedAt
             },
             where: {

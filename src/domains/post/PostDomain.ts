@@ -10,6 +10,7 @@ export default class Post {
         public title: string,
         public content: string,
         public isAnonymous: boolean,
+        public isNotice: boolean,
 
         public comments: Array<Comment>,
         
@@ -27,12 +28,13 @@ export default class Post {
         public deletedAt: Date | null
     ) {}
 
-    public static Create(title: string, content: string, isAnonymous: boolean, authorId: string, boardId: number, createdAt: Date) {
+    public static Create(title: string, content: string, isAnonymous: boolean, isNotice: boolean, authorId: string, boardId: number, createdAt: Date) {
         return new Post(
             null,
             title,
             content,
             isAnonymous,
+            isNotice,
             [],
             authorId,
             null,
@@ -52,6 +54,7 @@ export default class Post {
             row.title,
             row.content,
             row.isAnonymous,
+            row.isNotice,
             row.comments ? row.comments.map((comment: any) => Comment.FromRow(comment)) : [],
             row.authorId,
             row.author ? User.FromRow(row.author) : null,

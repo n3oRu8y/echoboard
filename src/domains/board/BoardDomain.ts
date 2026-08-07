@@ -6,6 +6,7 @@ class PostSummery {
         public title: string,
         public author: User,
         public isAnonymous: boolean,
+        public isNotice: boolean,
         public createdAt: Date
     ) {}
 
@@ -15,6 +16,7 @@ class PostSummery {
             row.title,
             User.FromRow(row.author),
             row.isAnonymous,
+            row.isNotice,
             row.createdAt
         );
     }

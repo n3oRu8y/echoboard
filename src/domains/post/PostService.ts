@@ -39,11 +39,11 @@ export default class PostService {
         this.AttachmentRepo = attachmentRepo;
     }
 
-    public async CreatePost(authorId: string, title: string, content: string, isAnonymous: boolean, boardId: number, imageIds: Array<string>, attachmentIds: Array<string>, token: string, ip: string, now: Date = new Date()) {
+    public async CreatePost(authorId: string, title: string, content: string, isAnonymous: boolean, isNotice: boolean, boardId: number, imageIds: Array<string>, attachmentIds: Array<string>, token: string, ip: string, now: Date = new Date()) {
         await TurnstileService.Verify(token, ip);
         const safeContent = safe(content);
         //const safeContent = content; // xss 필터링 끄고 테스트
-        const post = Post.Create(title, safeContent, isAnonymous, authorId, boardId, now);
+        const post = Post.Create(title, safeContent, isAnonymous, isNotice, authorId, boardId, now);
         return await prisma.$transaction(async tx => {
             const created = await this.postRepo.Create(post, tx);
             await this.AttachmentRepo.SetPostAttachments(created.id!, authorId, attachmentIds.concat(imageIds), tx);
@@ -52,7 +52,7 @@ export default class PostService {
         });
     }
 
-    public async UpdatePost(postId: number, boardUrl: string, authorId: string, title: string, content: string, attachmentIds: Array<string>, token: string, ip: string) {
+    public async UpdatePost(postId: number, boardUrl: string, authorId: string, title: string, content: string, isNotice: boolean, attachmentIds: Array<string>, token: string, ip: string) {
         await TurnstileService.Verify(token, ip);
         await prisma.$transaction(async tx => {
             const post = await this.postRepo.FindByIdAndBoardUrl(postId, boardUrl);
@@ -62,6 +62,7 @@ export default class PostService {
 
             post.title = title;
             post.content = safe(content);
+            post.isNotice = isNotice;
             // post.isAnonymous = isAnonymous;
 
             await this.postRepo.Update(postId, post, tx);

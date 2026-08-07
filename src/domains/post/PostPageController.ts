@@ -70,7 +70,7 @@ export default class PostPageController {
             return res.status(404).render("errors/404.ejs");
         }
 
-        if (!board.canWrite) {
+        if (!board.canWrite && user.role != "ADMIN") {
             return res.status(403).render("errors/alert.ejs", { message: "쓰기 권한이 없습니다." });
         }
 
@@ -101,7 +101,7 @@ export default class PostPageController {
             return res.status(404).render("errors/404.ejs");
         }
 
-        if (!board.canWrite) {
+        if (!board.canWrite && user.role != "ADMIN") {
             return res.status(403).render("errors/alert.ejs", { message: "쓰기 권한이 없습니다." });
         }
 

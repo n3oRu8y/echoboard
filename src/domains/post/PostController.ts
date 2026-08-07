@@ -28,9 +28,9 @@ export default class PostController {
             return res.status(400).json({ status: "error", message: "Turnstile 토큰이 입력되지 않았습니다." });
         }
 
-        const boardId = req.params.boardId as string;
+        const boardUrl = req.params.boardUrl as string;
         const boardService = new BoardService(new BoardRepo());
-        const board = await boardService.GetByUrl(boardId, true);
+        const board = await boardService.GetByUrl(boardUrl, true);
         if (!board) {
             return res.status(404).json({ status: "error", message: "게시판을 찾을 수 없습니다." });
         }
@@ -39,6 +39,10 @@ export default class PostController {
         const user = await userService.GetUserWithUserId(req.session.userId);
         if (user.IsBanned()) {
             return res.status(403).json({ status: "error", message: "차단된 사용자입니다." });
+        }
+
+        if (!board.canWrite && user.role != "ADMIN") {
+            return res.status(403).json({ status: "error", message: "게시판 쓰기 권한이 없습니다." });
         }
 
         const attachmentIds = Array.isArray(req.body.attachmentIds) ? req.body.attachmentIds : [];
@@ -105,6 +109,10 @@ export default class PostController {
         const user = await userService.GetUserWithUserId(req.session.userId);
         if (user.IsBanned()) {
             return res.status(403).json({ status: "error", message: "차단된 사용자입니다." });
+        }
+
+        if (!board.canWrite && user.role != "ADMIN") {
+            return res.status(403).json({ status: "error", message: "게시판 쓰기 권한이 없습니다." });
         }
 
         const postId = Number(req.params.postId);

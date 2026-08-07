@@ -72,6 +72,10 @@ export default class CommentController {
             return res.status(403).json({ status: "error", message: "차단된 사용자입니다." });
         }
 
+        if (!board.canRead && user.role != "ADMIN") {
+            return res.status(403).json({ status: "error", message: "댓글을 작성할 권한이 없습니다." });
+        }
+
         try {
             await CommentController.commentService.Create(req.session.userId, isAnonymous, req.body.content, post.id!, (parentId != undefined && parentId != null) ? Number(parentId) : null, token, ip);
         } catch (e) {

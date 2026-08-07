@@ -166,12 +166,14 @@ export default class PostController {
 
         const postService = new PostService(new PostRepository(), new AttachmentRepository());
         try {
-            await postService.UpdatePost(postId, boardUrl, user.id!, title, content, !!isNotice, attachmentIds, token, ip);
+            await postService.UpdatePost(postId, boardUrl, user, title, content, !!isNotice, attachmentIds, token, ip);
         } catch (e) {
             if (e instanceof PostNotFound) {
                 return res.status(404).json({ status: "error", message: "게시글을 찾을 수 없습니다." });
             } else if (e instanceof TurnstileFailed) {
                 return res.status(403).json({ status: "error", message: "보안 작업을 실패했습니다." });
+            } else if (e instanceof CredentialFailed) {
+                return res.status(403).json({ status: "error", message: "권한이 없습니다." });
             }
                         
             throw e;

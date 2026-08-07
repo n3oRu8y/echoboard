@@ -52,12 +52,20 @@ export default class PostService {
         });
     }
 
-    public async UpdatePost(postId: number, boardUrl: string, authorId: string, title: string, content: string, isNotice: boolean, attachmentIds: Array<string>, token: string, ip: string) {
+    public async UpdatePost(postId: number, boardUrl: string, user: User, title: string, content: string, isNotice: boolean, attachmentIds: Array<string>, token: string, ip: string) {
         await TurnstileService.Verify(token, ip);
         await prisma.$transaction(async tx => {
             const post = await this.postRepo.FindByIdAndBoardUrl(postId, boardUrl);
             if (!post) {
                 throw new PostNotFound(`Could not find a post with the id ${postId}.`);
+            }
+
+            if ((post.title != title || post.content != content) && post.authorId != user.id) {
+                throw new CredentialFailed("Only the author can edit this post.");
+            }
+
+            if (post.isNotice != isNotice && user.role != "ADMIN") {
+                throw new CredentialFailed("Only the administrator can close notice.");
             }
 
             post.title = title;
@@ -66,7 +74,7 @@ export default class PostService {
             // post.isAnonymous = isAnonymous;
 
             await this.postRepo.Update(postId, post, tx);
-            await this.AttachmentRepo.SetPostAttachments(postId, authorId, attachmentIds, tx);
+            await this.AttachmentRepo.SetPostAttachments(postId, user.id!, attachmentIds, tx);
         });
     }
 

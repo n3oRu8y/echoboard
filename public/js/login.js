@@ -5,6 +5,11 @@ loginForm.addEventListener("submit", async e => {
 
     const formData = new FormData(loginForm);
 
+    const token = await RenderTurnstile();
+    if (!token) {
+        alert("Turnstile 검증 실패");
+    }
+
     try {
         const res = await fetch("/api/auth/login", {
             method: "POST",
@@ -13,7 +18,8 @@ loginForm.addEventListener("submit", async e => {
             },
             body: JSON.stringify({
                 "username": formData.get("username")?.toString().trim(),
-                "password": formData.get("password")?.toString().trim()
+                "password": formData.get("password")?.toString().trim(),
+                token: token
             })
         });
 

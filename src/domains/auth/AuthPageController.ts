@@ -1,7 +1,8 @@
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
-const sitekey = process.env.HCAPTCHA_SITEKEY || "10000000-ffff-ffff-ffff-000000000001";
+const hcaptchaSitekey = process.env.HCAPTCHA_SITEKEY || "10000000-ffff-ffff-ffff-000000000001";
+const turnstileSitekey = process.env.TURNSTILE_SITEKEY || "1x00000000000000000000AA";
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export default class AuthPageController {
@@ -12,7 +13,8 @@ export default class AuthPageController {
         }
 
         return res.render("auth/login.ejs", {
-            title: "로그인"
+            title: "로그인",
+            sitekey: turnstileSitekey
         });
     }
 
@@ -23,7 +25,7 @@ export default class AuthPageController {
 
         return res.render("auth/register.ejs", {
             title: "회원가입",
-            sitekey: sitekey
+            sitekey: hcaptchaSitekey
         });
     }
 

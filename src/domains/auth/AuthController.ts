@@ -6,11 +6,16 @@ import { ConflictError } from "../../common/exceptions/ConflictError.js";
 import TOTPService from "../../application/totp/TOTPService.js";
 import CredentialFailed from "../../common/exceptions/CredentialFailed.js";
 import HCaptchaFailed from "../../infrastructures/captcha/exceptions/HCaptchaFailed.js";
+import AuthService from "./AuthService.js";
+import TurnstileService from "../../infrastructures/turnstile/TurnstileService.js";
+import TurnstileFailed from "../../infrastructures/turnstile/exceptions/TurnstileFailed.js";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export default class AuthController {
     private constructor() {};
+
+    private static authService = new AuthService();
 
     private static userRepo = new UserRepo();
     private static userService = new UserService(AuthController.userRepo);
@@ -21,17 +26,37 @@ export default class AuthController {
             return res.status(403).json({ status: "error", message: "이미 로그인했습니다." });
         }
 
-        const { username, password } = req.body;
+        const { username, password, token } = req.body;
+        if (!token) {
+            return res.status(400).json({ status: "error", message: "Turnstile을 진행해주세요." });
+        }
+
         if (!username || !password) {
             return res.status(400).json({ status: "error", message: "아이디와 비밀번호를 입력해주세요." });
+        }
+
+        const locked = await AuthController.authService.isLocked(req.ip as string);
+        if (locked) {
+            return res.status(429).json({ status: "error", message: "너무 많은 로그인 시도로 인해 로그인이 차단되었습니다."});
+        }
+
+        try {
+            await TurnstileService.Verify(token, req.ip as string);
+        } catch (e) {
+            if (e instanceof TurnstileFailed) {
+                return res.status(403).json({ status: "error", mesasge: "Turnstile 검증 실패." });
+            }
+            throw e;
         }
 
         const userService = new UserService(new UserRepo());
         const success = await userService.Login(username, password);
         if (!success) {
+            await AuthController.authService.SetLoginRateLimit(req.ip as string);
             return res.status(403).json({ status: "error", message: "아이디와 비밀번호를 확인해주세요." });
         }
 
+        await AuthController.authService.DeleteLoginRateLimit(req.ip as string);
         const userId = await userService.GetUserIdWithUsername(username);
         const user = await userService.GetUserWithUserId(userId!);
         if (user.twoFactorEnabled) {

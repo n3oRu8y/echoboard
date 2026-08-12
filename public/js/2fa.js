@@ -10,7 +10,6 @@ document.querySelectorAll("#two-fa-enable-form").forEach(form => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    secret: formData.get("secret")?.toString().trim(),
                     token: formData.get("token")?.toString().trim()
                 })
             });

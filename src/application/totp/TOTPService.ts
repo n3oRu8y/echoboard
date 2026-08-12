@@ -27,7 +27,14 @@ export default class TOTPService {
             issuer: "EchoBoard",
             label: email,
             secret: secret
-        });
+        })
+
+        const user = await this.userRepo.FindByUserId(userId);
+        if (!user) {
+            throw new UserNotFound("유저를 찾을 수 없습니다.");
+        }
+        user.twoFactorSecret = secret;
+        await this.userRepo.Update(userId, user);
 
         return new TOTPResult(secret, uri);
     }

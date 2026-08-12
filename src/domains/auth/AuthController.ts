@@ -111,8 +111,8 @@ export default class AuthController {
             return res.status(401).json({ status: "error", message: "로그인해주세요." });
         }
 
-        const { secret, token } = req.body;
-        if (!secret || !token) {
+        const { token } = req.body;
+        if (!token) {
             return res.status(400).json({ status: "error", message: "필수 인자 누락" });
         }
 
@@ -121,8 +121,12 @@ export default class AuthController {
             return res.status(409).json({ status: "error", message: "이미 2단계 인증이 활성화되어 있습니다." });
         }
 
+        if (!user.twoFactorSecret) {
+            return res.status(409).json({ status: "error", message: "시크릿이 생성되지 않았습니다." });
+        }
+
         try {
-            await AuthController.totpService.Enable(user.id!, secret, token);
+            await AuthController.totpService.Enable(user.id!, user.twoFactorSecret, token);
         } catch (e) {
             if (e instanceof CredentialFailed) {
                 return res.status(403).json({ status: "error", message: "2단계 인증 코드를 다시 확인해주세요." });

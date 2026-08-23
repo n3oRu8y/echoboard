@@ -7,6 +7,16 @@ import AttachmentService from "./AttachmentService.js";
 import AttachmentRepository from "./AttachmentRepository.js";
 import TurnstileFailed from "../../infrastructures/turnstile/exceptions/TurnstileFailed.js";
 
+const SAFE_INLINE_IMAGE_TYPES = new Set([
+    "image/avif",
+    "image/bmp",
+    "image/gif",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/x-icon"
+]);
+
 export default class AttachmentController {
     public static async UploadFile(req: Request, res: Response) {
         if (!req.session?.userId) {
@@ -90,6 +100,11 @@ export default class AttachmentController {
             return res.status(400).json({ status: "error", message: "파일이 없습니다." });
         }
 
+        const imageType = req.file.mimetype.toLowerCase();
+        if (!SAFE_INLINE_IMAGE_TYPES.has(imageType)) {
+            return res.status(400).json({ status: "error", message: "지원하지 않는 이미지 형식입니다." });
+        }
+
         const fileService = new FileService(new LocalFileStorage());
         if (req.file.size > 50 * 1024 * 1024) {
             return res.status(400).json({ status: "error", message: "파일이 너무 큽니다." });
@@ -137,13 +152,16 @@ export default class AttachmentController {
         const filename = attachment.fileName.normalize("NFC");
         const encoded = encodeURIComponent(filename);
         
-        if (attachment.fileType.toLowerCase().startsWith("image") || attachment.fileType.toLocaleLowerCase().startsWith("media"))
-            res.setHeader("Content-Disposition", `inline; filename*=UTF-8''${encoded}"`);
-        else
-           res.setHeader("Content-Disposition", `attachment; filename*=UTF-8''${encoded}`);
+        const fileType = attachment.fileType.toLowerCase();
+        const canRenderInline = attachment.isImage && SAFE_INLINE_IMAGE_TYPES.has(fileType);
 
-        res.setHeader("Content-Type", attachment.fileType);
+        res.setHeader(
+            "Content-Disposition",
+            `${canRenderInline ? "inline" : "attachment"}; filename*=UTF-8''${encoded}`
+        );
+        res.setHeader("Content-Type", canRenderInline ? fileType : "application/octet-stream");
         res.setHeader("X-Content-Type-Options", "nosniff");
+        res.setHeader("Content-Security-Policy", "default-src 'none'; sandbox");
 
         return res.status(200).send(file);
     }

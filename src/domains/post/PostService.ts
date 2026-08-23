@@ -9,6 +9,8 @@ import type PostRepository from "./PostRepositorty.js";
 import type User from "../user/UserDomain.js";
 import TurnstileService from "../../infrastructures/turnstile/TurnstileService.js";
 
+const ATTACHMENT_IMAGE_PATH = /^\/api\/attachments\/[A-Za-z0-9_-]+$/;
+
 export const safe = (content: string) =>
     sanitize(content, {
         allowedTags: sanitize.defaults.allowedTags.concat(["img"]),
@@ -18,7 +20,7 @@ export const safe = (content: string) =>
         },
         transformTags: {
             img(tagName, attribs) {
-                if (!attribs.src?.startsWith("/api/attachments/")) {
+                if (!ATTACHMENT_IMAGE_PATH.test(attribs.src ?? "")) {
                     delete attribs.src;
                 }
 
@@ -42,7 +44,6 @@ export default class PostService {
     public async CreatePost(authorId: string, title: string, content: string, isAnonymous: boolean, isNotice: boolean, boardId: number, imageIds: Array<string>, attachmentIds: Array<string>, token: string, ip: string, now: Date = new Date()) {
         await TurnstileService.Verify(token, ip);
         const safeContent = safe(content);
-        //const safeContent = content; // xss 필터링 끄고 테스트
         const post = Post.Create(title, safeContent, isAnonymous, isNotice, authorId, boardId, now);
         return await prisma.$transaction(async tx => {
             const created = await this.postRepo.Create(post, tx);

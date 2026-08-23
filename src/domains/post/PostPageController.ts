@@ -173,7 +173,7 @@ export default class PostPageController {
             }
         }
 
-        post.content = safe(post.content); // XSS 필터링
+        post.content = safe(post.content);
 
         return res.render("post/post.ejs", {
             post: post,

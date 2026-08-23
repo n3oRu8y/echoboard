@@ -83,13 +83,10 @@ document.querySelectorAll("#two-fa-verify-form").forEach(form => {
                 return;
             }
 
-            const redirect = new URLSearchParams(location.search).get("redirect");
-
-            if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
-                location.href = redirect;
-            } else {
-                location.href = "/";
-            }
+            const value = new URLSearchParams(location.search).get("redirect");
+            const redirect = value && URL.canParse(value, location.origin) ? new URL(value, location.origin) : null;
+            location.href = redirect?.origin === location.origin
+                ? `${redirect.pathname}${redirect.search}${redirect.hash}` : "/";
         } catch {
             const error = document.querySelector("#error-message");
             error.textContent = "인터넷 연결 상태를 확인해주세요.";

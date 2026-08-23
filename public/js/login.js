@@ -29,17 +29,13 @@ loginForm.addEventListener("submit", async e => {
             return alert(data.message);
         }
 
-        const redirect = new URLSearchParams(location.search).get("redirect");
+        const value = new URLSearchParams(location.search).get("redirect");
+        const redirect = value && URL.canParse(value, location.origin) ? new URL(value, location.origin) : null;
+        const target = redirect?.origin === location.origin ? `${redirect.pathname}${redirect.search}${redirect.hash}` : "/";
 
-        if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
-            if (data.message == "pending")
-                return location.href = `/login/2fa?redirect=${redirect}`;
-            location.href = redirect;
-        } else {
-            if (data.message == "pending")
-                return location.href = "/login/2fa";
-            location.href = "/";
-        }
+        if (data.message == "pending")
+            return location.href = `/login/2fa?redirect=${encodeURIComponent(target)}`;
+        location.href = target;
     } catch {
         return alert("인터넷 연결상태를 확인해주세요.");
     }

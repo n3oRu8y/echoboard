@@ -13,6 +13,7 @@ import PageNotFound from "./middlewares/PageNotFound.js";
 import PageError from "./middlewares/PageError.js";
 import ViewService from "./application/view/ViewService.js";
 import { SetupMiddleware } from "./middlewares/SetupMiddleware.js";
+import CsrfMiddleware from "./middlewares/CsrfMiddleware.js";
 
 const PORT = Number(process.env.PORT) || 3000;
 const SESSION_SECRET = `${process.env.SESSION_SECRET}`;
@@ -37,6 +38,7 @@ app.use(session({
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV == "production",
+        sameSite: "lax",
         maxAge: 1000 * 60 * 30
     }
 }));
@@ -59,6 +61,8 @@ app.use(express.urlencoded({
 }));
 
 app.use(cookieParser());
+
+app.use(CsrfMiddleware);
 
 app.use(SetupMiddleware);
 

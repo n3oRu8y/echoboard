@@ -21,6 +21,13 @@ export default class AuthController {
     private static userService = new UserService(AuthController.userRepo);
     private static totpService = new TOTPService(AuthController.userRepo);
 
+    private static async StartAuthenticatedSession(req: Request, userId: string) {
+        await new Promise<void>((resolve, reject) => {
+            req.session.regenerate(error => error ? reject(error) : resolve());
+        });
+        req.session.userId = userId;
+    }
+
     static async Login(req: Request, res: Response) {
         if (req.session?.userId) {
             return res.status(403).json({ status: "error", message: "이미 로그인했습니다." });
@@ -74,13 +81,14 @@ export default class AuthController {
                 res.cookie("pd", token, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV == "production",
+                    sameSite: "lax",
                     maxAge: 5 * 60 * 1000
                 });
                 return res.status(200).json({ status: "ok", message: "pending" });
             }
         }
 
-        req.session.userId = userId!;
+        await AuthController.StartAuthenticatedSession(req, userId!);
 
         return res.status(200).json({ status: "ok", message: "success" });
     }
@@ -231,12 +239,18 @@ export default class AuthController {
             res.cookie("dt", dt, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV == "production",
+                sameSite: "lax",
                 maxAge: 30 * 24 * 60 * 60 * 1000
             });
         }
 
-        res.cookie("pd", undefined, { maxAge: 0 });
-        req.session.userId = userId;
+        res.cookie("pd", undefined, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV == "production",
+            sameSite: "lax",
+            maxAge: 0
+        });
+        await AuthController.StartAuthenticatedSession(req, userId);
 
         return res.status(200).json({ status: "ok" });
     }
